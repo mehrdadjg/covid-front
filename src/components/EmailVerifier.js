@@ -33,10 +33,8 @@ export default function EmailVerifier() {
   const updateStatusAndRequestVisibility = () => {
     if (!done) {
       if (business.emailVerificationSentAt) {
-        console.log(2);
         const sinceVerificationSent =
           new Date() - Date.parse(business.emailVerificationSentAt);
-        console.log(sinceVerificationSent);
 
         if (sinceVerificationSent < 300000) {
           setRequestDisabled(() => true);
@@ -48,7 +46,6 @@ export default function EmailVerifier() {
           message: "Verification email was sent.",
         }));
       } else {
-        console.log(3);
         setRequestDisabled(() => false);
         setStatus((old) => ({
           ...old,
