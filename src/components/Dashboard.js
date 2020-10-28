@@ -1,26 +1,14 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
 
-import EmailVerifier from "./EmailVerifier";
+import BusinessOverview from "./BusinessOverview";
 import Profile from "./Profile";
 import QRCode from "./QRCode";
-import StatusBar from "./StatusBar";
 
-import {
-  FormControl,
-  Grid,
-  MenuItem,
-  Select,
-  Tab,
-  Tabs,
-} from "@material-ui/core";
+import { FormControl, MenuItem, Select, Tab, Tabs } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 export default function Dashboard() {
-  const business = useSelector((state) => state.business);
-  const emailIsVerified = business.emailIsVerified;
-
   const [tabIndex, setTabIndex] = useState(0);
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
@@ -42,7 +30,6 @@ export default function Dashboard() {
   const isSmallScreen = useMediaQuery({ maxWidth: 850 });
 
   const classes = useStyles();
-
   return (
     <div
       className={classes.root}
@@ -52,7 +39,9 @@ export default function Dashboard() {
         <FormControl variant="outlined" className={classes.formControl}>
           <Select value={tabIndex} onChange={handleSelectChange}>
             {menuItems.map((item) => (
-              <MenuItem value={item.index}>{item.name}</MenuItem>
+              <MenuItem key={item.index} value={item.index}>
+                {item.name}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -71,6 +60,14 @@ export default function Dashboard() {
       )}
       <TabPanel
         currentTab={tabIndex}
+        index={0}
+        persist={true}
+        isSmallScreen={isSmallScreen}
+      >
+        <BusinessOverview />
+      </TabPanel>
+      <TabPanel
+        currentTab={tabIndex}
         index={1}
         persist={true}
         isSmallScreen={isSmallScreen}
@@ -87,41 +84,6 @@ export default function Dashboard() {
       </TabPanel>
     </div>
   );
-
-  return (
-    <div className={classes.root}>
-      <Grid container direction="row">
-        <Grid item xs={12}>
-          <StatusBar />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Grid container direction="row">
-            {emailIsVerified ? null : (
-              <Grid item xs={12}>
-                <EmailVerifier />
-              </Grid>
-            )}
-            <Grid item xs={12}>
-              <div style={{ minHeight: 300, background: "#FF000050" }} />
-            </Grid>
-            <Grid item xs={12}>
-              <div style={{ minHeight: 300, background: "#FFFF0050" }} />
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item xs={12} md={9}>
-          <Grid container direction="row">
-            <Grid item xs={12}>
-              <Profile />
-            </Grid>
-            <Grid item xs={12}>
-              <QRCode />
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
-    </div>
-  );
 }
 
 function TabPanel(props) {
@@ -134,9 +96,11 @@ function TabPanel(props) {
     ...other
   } = props;
 
+  const classes = useStyles();
   return (
     <div
       role="tabpanel"
+      className={classes.panel}
       hidden={currentTab !== index}
       style={isSmallScreen ? {} : { marginLeft: "20vw" }}
       {...other}
@@ -165,5 +129,9 @@ const useStyles = makeStyles((theme) => ({
     width: 200,
     textAlign: "center",
     alignSelf: "center",
+  },
+  panel: {
+    position: "relative",
+    width: "100%",
   },
 }));

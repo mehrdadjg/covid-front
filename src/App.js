@@ -7,6 +7,7 @@ import { signIn } from "./actions/signedIn";
 import { setBusiness } from "./actions/business";
 import { setAuthentication } from "./actions/authentication";
 
+import CheckIn from "./components/CheckIn";
 import Header from "./components/Header";
 import WelcomeScreen from "./screens/WelcomeScreen";
 import BusinessScreen from "./screens/BusinessScreen";
@@ -36,6 +37,9 @@ export default function App() {
       <Header />
       <div className={styles.contents}>
         <Switch>
+          <Route exact path="/checkin/:businessID">
+            <CheckIn />
+          </Route>
           <Route exact path="/business">
             <BusinessScreen />
           </Route>

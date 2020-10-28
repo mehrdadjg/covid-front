@@ -6,6 +6,7 @@ import {
   Card,
   CardActionArea,
   CardActions,
+  CardContent,
   CardMedia,
   Typography,
 } from "@material-ui/core";
@@ -17,27 +18,29 @@ export default function QRCode() {
   const [state, setState] = useState({ waitingForQR: true, svg: null });
 
   useEffect(() => {
-    fetch("/business/getcode", {
-      cache: "no-cache",
-      headers: {
-        Authorization: `${auth.type} ${auth.value}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.code === 0) {
-          setState(() => ({
-            waitingForQR: false,
-            svg: encodeURIComponent(data.qr),
-          }));
-        } else {
-          console.log(data);
-        }
+    if (auth && auth.type) {
+      fetch("/business/getcode", {
+        cache: "no-cache",
+        headers: {
+          Authorization: `${auth.type} ${auth.value}`,
+          "Content-Type": "application/json",
+        },
       })
-      .catch((error) => {
-        console.log(error);
-      });
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.code === 0) {
+            setState(() => ({
+              waitingForQR: false,
+              svg: encodeURIComponent(data.qr),
+            }));
+          } else {
+            console.log(data);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }, [auth]);
 
   const handleDownloadImage = () => {
@@ -104,12 +107,12 @@ export default function QRCode() {
   } else {
     return (
       <Card className={classes.cardContainer}>
-        <CardActionArea>
+        <CardContent>
           <CardMedia className={classes.media} title="QR Code">
             <img src={`data:image/svg+xml,${state.svg}`} alt="QR Code" />
           </CardMedia>
-        </CardActionArea>
-        <CardActions>
+        </CardContent>
+        <CardActions style={{ justifyContent: "center" }}>
           <Button size="small" color="primary" onClick={handleDownloadImage}>
             Download as Image
           </Button>
@@ -129,7 +132,5 @@ const useClasses = makeStyles((theme) => ({
   cardContainer: {
     maxWidth: 400,
   },
-  media: {
-    height: 400,
-  },
+  media: {},
 }));

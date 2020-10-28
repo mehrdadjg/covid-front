@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { useMediaQuery } from "react-responsive";
 import { useDispatch, useSelector } from "react-redux";
 
 import { setLastVerificationEmailTime, verifyEmail } from "../actions/business";
 
 import {
   Button,
+  Card,
+  CardActions,
+  CardContent,
   CircularProgress,
-  Grid,
   TextField,
   Typography,
 } from "@material-ui/core";
@@ -18,33 +21,46 @@ export default function EmailVerifier() {
   const auth = useSelector((state) => state.auth);
 
   const [verificationCode, setVerificationCode] = useState("");
-  const [requestVisible, setRequestVisibility] = useState(false);
-  const [status, setStatus] = useState("Wait for it...");
+  const [requestDisabled, setRequestDisabled] = useState(true);
+  const [status, setStatus] = useState({
+    error: false,
+    errorMessage: "",
+    message: "",
+  });
   const [disabled, setDisabled] = useState(false);
-  const [error, setError] = useState({ has: false, message: "" });
   const [done, setDone] = useState(false);
 
   const updateStatusAndRequestVisibility = () => {
     if (!done) {
       if (business.emailVerificationSentAt) {
+        console.log(2);
         const sinceVerificationSent =
           new Date() - Date.parse(business.emailVerificationSentAt);
+        console.log(sinceVerificationSent);
 
         if (sinceVerificationSent < 300000) {
-          setRequestVisibility(() => false);
-          setStatus(
-            () =>
-              "Verification email was sent. You can request a new code in 5 minutes."
-          );
+          setRequestDisabled(() => true);
         } else {
-          setRequestVisibility(() => true);
-          setStatus(() => "Verification email was sent.");
+          setRequestDisabled(() => false);
         }
+        setStatus((old) => ({
+          ...old,
+          message: "Verification email was sent.",
+        }));
       } else {
-        setStatus(() => "You must verify your email address.");
+        console.log(3);
+        setRequestDisabled(() => false);
+        setStatus((old) => ({
+          ...old,
+          message: "You must verify your email address.",
+        }));
       }
     } else {
-      setStatus(() => "Thank you for verifying your email.");
+      setStatus((old) => ({
+        ...old,
+        error: false,
+        message: "Thank you for verifying your email.",
+      }));
     }
   };
 
@@ -57,7 +73,7 @@ export default function EmailVerifier() {
     return () => {
       clearInterval(id);
     };
-  });
+  }, [business.emailVerificationSentAt, done]);
 
   const handleTextChange = (value) => {
     setVerificationCode(() => value);
@@ -76,18 +92,23 @@ export default function EmailVerifier() {
           let emailVerificationSentAt = data.verificationSentAt;
 
           dispatcher(setLastVerificationEmailTime(emailVerificationSentAt));
-          setError((old) => ({ ...old, has: false }));
+          setStatus((old) => ({
+            ...old,
+            error: false,
+          }));
         } else {
-          setError(() => ({
-            has: true,
-            message: "Could not send email. Try again later.",
+          setStatus((old) => ({
+            ...old,
+            error: true,
+            errorMessage: "Could not send email. Try again later.",
           }));
         }
       })
       .catch(() => {
-        setError(() => ({
-          has: true,
-          message: "Something went wrong. Contact the administrator.",
+        setStatus((old) => ({
+          ...old,
+          error: true,
+          errorMessage: "Something went wrong. Contact the administrator.",
         }));
       })
       .finally(() => {
@@ -97,9 +118,10 @@ export default function EmailVerifier() {
 
   const handleSubmit = () => {
     if (verificationCode.length !== 6) {
-      setError(() => ({
-        has: true,
-        message: "Verification code is too short.",
+      setStatus((old) => ({
+        ...old,
+        error: true,
+        errorMessage: "Verification code is too short.",
       }));
       return;
     }
@@ -124,73 +146,92 @@ export default function EmailVerifier() {
             dispatcher(verifyEmail());
           }, 3000);
         } else {
-          setError(() => ({
-            has: true,
-            message: "Verification code is incorrect. Try again.",
+          setStatus((old) => ({
+            ...old,
+            error: true,
+            errorMessage: "Verification code is incorrect. Try again.",
           }));
           setDisabled(() => false);
         }
       })
       .catch(() => {
-        setError(() => ({
-          has: true,
-          message: "Something went wrong. Contact the administrator.",
+        setStatus((old) => ({
+          ...old,
+          error: true,
+          errorMessage: "Something went wrong. Contact the administrator.",
         }));
         setDisabled(() => false);
       });
   };
 
+  const isTinyScreen = useMediaQuery({ maxWidth: 600 });
+
   const classes = useClasses();
   return (
-    <div className={classes.root}>
-      <Typography variant="caption">Status: {status}</Typography>
-      {disabled ? (
-        <div className={classes.progressContainer}>
-          <CircularProgress color="secondary" />
-        </div>
-      ) : null}
-      <div style={disabled ? { pointerEvents: "none", opacity: 0.4 } : {}}>
-        <Grid container direction="row">
-          <Grid item xs={12}>
-            <TextField
-              type="text"
-              margin="normal"
-              variant="outlined"
-              label="Verification Code"
-              fullWidth
-              onChange={(event) => handleTextChange(event.target.value)}
-              inputProps={{ maxLength: 6, style: { textAlign: "center" } }}
-            />
-          </Grid>
-          <Grid item xs={12} className={classes.buttonsContainer}>
-            {requestVisible ? (
-              <Button
-                className={classes.requestButton}
-                variant="contained"
-                color="primary"
-                onClick={handleRequest}
-              >
-                Request New Code
-              </Button>
-            ) : null}
-
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
-              Submit
-            </Button>
-          </Grid>
-          {error.has ? (
-            <Grid item xs={12}>
-              <Typography variant="caption">Error: {error.message}</Typography>
-            </Grid>
-          ) : null}
-        </Grid>
-      </div>
-    </div>
+    <Card
+      className={classes.root}
+      style={
+        isTinyScreen
+          ? {
+              width: "90vw",
+              minWidth: "auto",
+              boxSizing: "border-box",
+              right: "50%",
+              marginRight: "-45vw",
+            }
+          : {}
+      }
+      raised={true}
+    >
+      <CardContent style={{ padding: "16px 16px 0px 16px" }}>
+        <Typography
+          variant="caption"
+          color={status.error ? "error" : "textPrimary"}
+        >
+          {status.error ? status.errorMessage : status.message}
+        </Typography>
+        {disabled ? (
+          <div className={classes.progressContainer}>
+            <CircularProgress color="secondary" />
+          </div>
+        ) : null}
+        <TextField
+          type="text"
+          margin="normal"
+          variant="outlined"
+          label="Verification Code"
+          fullWidth
+          onChange={(event) => handleTextChange(event.target.value)}
+          inputProps={{ maxLength: 6, style: { textAlign: "center" } }}
+        />
+      </CardContent>
+      <CardActions style={{ justifyContent: "flex-end" }}>
+        <Button
+          className={classes.requestButton}
+          size="small"
+          color="primary"
+          disabled={requestDisabled}
+          onClick={handleRequest}
+        >
+          Request Code
+        </Button>
+        <Button size="small" color="primary" onClick={handleSubmit}>
+          Submit
+        </Button>
+      </CardActions>
+    </Card>
   );
 }
 
 const useClasses = makeStyles((theme) => ({
-  root: { position: "relative", padding: theme.spacing(1) },
+  root: {
+    position: "absolute",
+    margin: theme.spacing(2),
+    width: "30vw",
+    minWidth: 350,
+    right: 0,
+    borderRadius: 15,
+  },
   progressContainer: {
     position: "absolute",
     width: "calc(100% - 16px)",
@@ -199,6 +240,5 @@ const useClasses = makeStyles((theme) => ({
     top: "calc(50% - 20px)",
   },
   disabledContainer: { pointerEvents: "none", opacity: 0.4 },
-  buttonsContainer: { textAlign: "end" },
   requestButton: { marginRight: theme.spacing(1) },
 }));

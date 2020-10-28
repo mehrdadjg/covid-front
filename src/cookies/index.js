@@ -8,6 +8,7 @@ const getCookie = (name) => {
 };
 
 const setCookie = (name, value, options = {}) => {
+  cookies.remove(name);
   cookies.set(name, value, { path: "/", ...options });
 };
 

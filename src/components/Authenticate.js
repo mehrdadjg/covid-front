@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { setCookie } from "../cookies";
 import { signIn } from "../actions/signedIn";
 import { setBusiness } from "../actions/business";
 import { setAuthentication } from "../actions/authentication";
@@ -144,12 +143,6 @@ export default function Authenticate() {
 
   const handleLogin = (data, wasSignUp) => {
     const business = beautifyBusiness(data.business);
-
-    setCookie("business_logged_in", business);
-    setCookie("auth", {
-      type: data.authentication.type,
-      value: data.authentication.jwt,
-    });
 
     // delete these later
     console.log(business);
