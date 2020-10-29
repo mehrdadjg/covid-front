@@ -3,7 +3,7 @@ import { useMediaQuery } from "react-responsive";
 
 import BusinessOverview from "./BusinessOverview";
 import Profile from "./Profile";
-import QRCode from "./QRCode";
+import Customize from "./Customize";
 
 import { FormControl, MenuItem, Select, Tab, Tabs } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
@@ -80,7 +80,7 @@ export default function Dashboard() {
         persist={true}
         isSmallScreen={isSmallScreen}
       >
-        <QRCode />
+        <Customize />
       </TabPanel>
     </div>
   );

@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import {
   Button,
   Card,
-  CardActionArea,
   CardActions,
   CardContent,
   CardMedia,
@@ -130,7 +129,9 @@ const useClasses = makeStyles((theme) => ({
     padding: theme.spacing(1),
   },
   cardContainer: {
-    maxWidth: 400,
+    width: 500,
   },
-  media: {},
+  media: {
+    width: 500,
+  },
 }));

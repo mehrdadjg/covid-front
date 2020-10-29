@@ -30,7 +30,7 @@ export default function EmailVerifier() {
   const [disabled, setDisabled] = useState(false);
   const [done, setDone] = useState(false);
 
-  const updateStatusAndRequestVisibility = () => {
+  useEffect(() => {
     if (!done) {
       if (business.emailVerificationSentAt) {
         const sinceVerificationSent =
@@ -59,17 +59,6 @@ export default function EmailVerifier() {
         message: "Thank you for verifying your email.",
       }));
     }
-  };
-
-  useEffect(() => {
-    updateStatusAndRequestVisibility();
-
-    const id = setInterval(() => {
-      updateStatusAndRequestVisibility();
-    }, 5000);
-    return () => {
-      clearInterval(id);
-    };
   }, [business.emailVerificationSentAt, done]);
 
   const handleTextChange = (value) => {
