@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
+import Lottie from "lottie-web";
 
 import { setProfile } from "../actions/business";
 
@@ -9,10 +11,12 @@ import {
   FormControl,
   FormHelperText,
   Grid,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
   TextField,
+  Tooltip,
   Typography,
 } from "@material-ui/core";
 import { green } from "@material-ui/core/colors";
@@ -236,6 +240,24 @@ export default function Profile() {
     waiting: false,
   });
 
+  const businessTypes = ["Restaurant or Bar", "Store", "Other"];
+  const canadianProvinces = [
+    "Alberta",
+    "British Columbia",
+    "Manitoba",
+    "New Brunswick",
+    "Newfoundland and Labrador",
+    "Northwest Territories",
+    "Nova Scotia",
+    "Nunavut",
+    "Ontario",
+    "Prince Edward Island",
+    "Quebec",
+    "Saskatchewan",
+    "Yukon",
+  ];
+  const preferredTimes = ["Morning", "Afternoon", "Evening", "No Preferrence"];
+
   const inputsAreValid = () => {
     let valid = true;
 
@@ -262,7 +284,10 @@ export default function Profile() {
         helper: "Business type cannot be empty.",
       }));
       valid = false;
-    } else if (![0, 1, 100].includes(businessType.value)) {
+    } else if (
+      businessType.value >= 0 &&
+      businessType.value < businessTypes.length
+    ) {
       setBusinessType((old) => ({
         ...old,
         error: true,
@@ -297,7 +322,8 @@ export default function Profile() {
       }));
       valid = false;
     } else if (
-      ![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].includes(province.value)
+      province.value > 0 &&
+      province.value < canadianProvinces.length
     ) {
       setProvince((old) => ({
         ...old,
@@ -346,7 +372,10 @@ export default function Profile() {
         helper: "Preferred time cannot be empty.",
       }));
       valid = false;
-    } else if (![0, 1, 2, 100].includes(preferredTime.value)) {
+    } else if (
+      preferredTime.value >= 0 &&
+      preferredTime.value < preferredTimes.length
+    ) {
       setPreferredTime((old) => ({
         ...old,
         error: true,
@@ -421,6 +450,155 @@ export default function Profile() {
   };
 
   const classes = useClasses();
+  return (
+    <div className={classes.root}>
+      <Typography
+        variant="body1"
+        onClick={() => {
+          setBusinessType((old) => ({ ...old, error: !old.error }));
+        }}
+      >
+        You can change the following setting. We will store them as you are
+        editing.
+      </Typography>
+      <Grid
+        className={classes.formContainer}
+        container
+        direction="row"
+        spacing={2}
+      >
+        <Grid item xs={12} sm={6} md={8}>
+          <IconedInputField
+            type="text"
+            required
+            label="Business Name"
+            inputValue={businessName.value}
+            onChange={handleBusinessNameChange}
+            inputError={businessName.error}
+            icon={businessName.error ? "error" : ""}
+            iconMessage={businessName.helper}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <IconedInputField
+            type="select"
+            required
+            items={businessTypes}
+            label="Business Type"
+            inputValue={businessType.value}
+            onChange={handleBusinessTypeChange}
+            inputError={businessType.error}
+            icon={businessType.error ? "error" : ""}
+            iconIsButton
+            onIconClick={() => {}}
+            iconMessage={"businessType.helper"}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <IconedInputField
+            type="text"
+            required
+            label="Address Line 1"
+            inputValue={address1.value}
+            onChange={handleAddress1Change}
+            inputError={address1.error}
+            icon={address1.error ? "error" : ""}
+            iconMessage={address1.helper}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <IconedInputField
+            type="text"
+            label="Address Line 2"
+            inputValue={address2.value}
+            onChange={handleAddress2Change}
+          />
+        </Grid>
+        <Grid item xs={6} sm={4} md={2}>
+          <IconedInputField
+            type="text"
+            required
+            label="City"
+            inputValue={city.value}
+            onChange={handleCityChange}
+            inputError={city.error}
+            icon={city.error ? "error" : ""}
+            iconMessage={city.helper}
+          />
+        </Grid>
+        <Grid item xs={6} sm={4} md={2}>
+          <IconedInputField
+            type="select"
+            required
+            items={canadianProvinces}
+            label="Province"
+            inputValue={province.value}
+            onChange={handleProvinceChange}
+            inputError={province.error}
+            icon={province.error ? "error" : ""}
+            iconIsButton
+            onIconClick={() => {}}
+            iconMessage={"businessType.helper"}
+          />
+        </Grid>
+        <Grid item xs={6} sm={4} md={2}>
+          <IconedInputField
+            type="text"
+            required
+            label="Postal Code"
+            inputProps={{ maxLength: 6 }}
+            placeholder="A1A1A1"
+            inputValue={postalCode.value}
+            onChange={handlePostalCodeChange}
+            inputError={postalCode.error}
+            icon={postalCode.error ? "error" : ""}
+            iconMessage={postalCode.helper}
+          />
+        </Grid>
+        <Grid item xs={6} md={3}>
+          <IconedInputField
+            type="text"
+            required
+            label="Phone Number"
+            inputProps={{ maxLength: 14 }}
+            placeholder="(111) 111 1111"
+            inputValue={beautifyPhoneNumber(phoneNumber.value)}
+            onChange={handlePhoneNumberChange}
+            inputError={phoneNumber.error}
+            icon={phoneNumber.error ? "error" : ""}
+            iconMessage={phoneNumber.helper}
+          />
+        </Grid>
+        <Grid item xs={6} md={3}>
+          <IconedInputField
+            type="select"
+            required
+            items={preferredTimes}
+            label="Preferred Time"
+            inputValue={preferredTime.value}
+            onChange={handlePreferredTimeChange}
+            inputError={preferredTime.error}
+            icon={preferredTime.error ? "error" : ""}
+            iconIsButton
+            onIconClick={() => {}}
+            iconMessage={"businessType.helper"}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <IconedInputField
+            type="text"
+            multiline
+            rows={3}
+            label="Submission Message"
+            inputValue={submissionMessage.value}
+            onChange={handleBusinessNameChange}
+            icon={""}
+            iconMessage={""}
+          />
+        </Grid>
+      </Grid>
+    </div>
+  );
   return (
     <div className={classes.root}>
       <Grid container direction="row">
@@ -710,10 +888,178 @@ export default function Profile() {
   );
 }
 
+const IconedInputField = (props) => {
+  const {
+    type,
+    required,
+    label,
+    items,
+    inputValue,
+    inputError,
+    icon,
+    iconIsButton,
+    onIconClick,
+    iconMessage,
+    ...other
+  } = props;
+  const classes = useClasses();
+
+  let input = null;
+  if (type === "text") {
+    input = (
+      <TextField
+        label={label}
+        variant="outlined"
+        required={required}
+        InputLabelProps={{
+          classes: {
+            asterisk: classes.asterisk,
+          },
+        }}
+        fullWidth
+        value={inputValue}
+        error={inputError}
+        {...other}
+      />
+    );
+  } else if (type === "select") {
+    input = (
+      <TextField
+        label={label}
+        variant="outlined"
+        select
+        SelectProps={{
+          MenuProps: {
+            disableScrollLock: true,
+          },
+        }}
+        required={required}
+        InputLabelProps={{
+          classes: {
+            asterisk: classes.asterisk,
+          },
+        }}
+        fullWidth
+        value={inputValue}
+        error={inputError}
+        {...other}
+      >
+        {items.map((item, index) => (
+          <MenuItem key={index} value={index}>
+            {item}
+          </MenuItem>
+        ))}
+      </TextField>
+    );
+  }
+
+  const [iconProperties, setIconProperties] = useState({
+    size: 0,
+    opacity: 0,
+  });
+
+  const iconContainer = useRef(null);
+  useEffect(() => {
+    if (icon === "error") {
+      setIconProperties((old) => ({
+        ...old,
+        opacity: 1,
+        size: 40,
+      }));
+      const errorAnimation = require("../animations/error.json");
+      Lottie.loadAnimation({
+        container: iconContainer.current,
+        renderer: "svg",
+        loop: false,
+        autoplay: true,
+        animationData: errorAnimation,
+      });
+    } else if (icon === "done") {
+      setIconProperties((old) => ({
+        ...old,
+        opacity: 1,
+        size: 40,
+      }));
+      const errorAnimation = require("../animations/done.json");
+      Lottie.loadAnimation({
+        container: iconContainer.current,
+        renderer: "svg",
+        loop: false,
+        autoplay: true,
+        animationData: errorAnimation,
+      }).addEventListener("complete", () => {
+        setIconProperties((old) => ({
+          ...old,
+          opacity: 0,
+          size: 0,
+        }));
+        setTimeout(() => {
+          Lottie.destroy();
+        }, 250);
+      });
+    } else {
+      setIconProperties((old) => ({
+        ...old,
+        opacity: 0,
+        size: 0,
+      }));
+      setTimeout(() => {
+        Lottie.destroy();
+      }, 250);
+    }
+  }, [icon]);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+      }}
+    >
+      {input}
+      <Tooltip title={iconMessage} placement="left">
+        {iconIsButton ? (
+          <IconButton
+            color="primary"
+            classes={{ root: classes.iconButton }}
+            onClick={onIconClick}
+          >
+            <div
+              style={{
+                width: `${iconProperties.size}px`,
+                height: `${iconProperties.size}px`,
+                opacity: iconProperties.opacity,
+                overflow: "hidden",
+                transition: "all 0.25s ease-out",
+              }}
+              ref={iconContainer}
+            />
+          </IconButton>
+        ) : (
+          <div
+            style={{
+              width: `${iconProperties.size}px`,
+              height: `${iconProperties.size}px`,
+              opacity: iconProperties.opacity,
+              overflow: "hidden",
+              transition: "all 0.25s ease-out",
+            }}
+            ref={iconContainer}
+          />
+        )}
+      </Tooltip>
+    </div>
+  );
+};
+
 const useClasses = makeStyles((theme) => ({
   root: {
     padding: theme.spacing(1),
     minHeight: 1000,
+  },
+  formContainer: {
+    marginTop: theme.spacing(3),
   },
   buttonWrapper: {
     position: "relative",
@@ -729,4 +1075,5 @@ const useClasses = makeStyles((theme) => ({
   asterisk: {
     color: "red",
   },
+  iconButton: { padding: "0" },
 }));
