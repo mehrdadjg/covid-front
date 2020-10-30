@@ -27,6 +27,30 @@ export default function Profile() {
   const auth = useSelector((state) => state.auth);
   const business = useSelector((state) => state.business);
 
+  const [status, setStatus] = useState({
+    businessName: {
+      value: "",
+      formattingError: false,
+      formattingMessage: "",
+      submissionStatus: "",
+      submissionMessage: "",
+    },
+  });
+
+  const handleChange = (event, field) => {
+    event.persist();
+    setStatus((old) => {
+      const newStatus = { ...old };
+      newStatus[field] = {
+        ...old[field],
+        value: event.target.value,
+        formattingError: false,
+        formattingMessage: "",
+      };
+      return newStatus;
+    });
+  };
+
   const [businessName, setBusinessName] = useState({
     value: "",
     error: false,
@@ -207,31 +231,56 @@ export default function Profile() {
 
   useEffect(() => {
     if (business.profile) {
-      setBusinessName((old) => ({
-        ...old,
-        value: business.profile.businessName,
+      setStatus(() => ({
+        businessName: {
+          value: business.profile.businessName || "",
+          formattingError: false,
+          formattingMessage: "",
+          submissionStatus: "",
+          submissionMessage: "",
+        },
       }));
-      setBusinessType((old) => ({
-        ...old,
-        value: business.profile.businessType,
-      }));
-      setAddress1((old) => ({ ...old, value: business.profile.address1 }));
-      setAddress2((old) => ({ ...old, value: business.profile.address2 }));
-      setCity((old) => ({ ...old, value: business.profile.city }));
-      setProvince((old) => ({ ...old, value: business.profile.province }));
-      setPostalCode((old) => ({ ...old, value: business.profile.postalCode }));
-      setPhoneNumber((old) => ({
-        ...old,
-        value: business.profile.phoneNumber,
-      }));
-      setPreferredTime((old) => ({
-        ...old,
-        value: business.profile.preferredTime,
-      }));
-      setSubmissionMessage((old) => ({
-        ...old,
-        value: business.profile.submissionMessage,
-      }));
+      business.profile.businessName &&
+        setBusinessName((old) => ({
+          ...old,
+          value: business.profile.businessName,
+        }));
+      business.profile.businessType &&
+        setBusinessType((old) => ({
+          ...old,
+          value: business.profile.businessType,
+        }));
+      business.profile.address1 &&
+        setAddress1((old) => ({ ...old, value: business.profile.address1 }));
+      business.profile.address2 &&
+        setAddress2((old) => ({ ...old, value: business.profile.address2 }));
+      business.profile.city &&
+        setCity((old) => ({ ...old, value: business.profile.city }));
+      business.profile.province &&
+        setProvince((old) => ({
+          ...old,
+          value: business.profile.province,
+        }));
+      business.profile.postalCode &&
+        setPostalCode((old) => ({
+          ...old,
+          value: business.profile.postalCode,
+        }));
+      business.profile.phoneNumber &&
+        setPhoneNumber((old) => ({
+          ...old,
+          value: business.profile.phoneNumber,
+        }));
+      business.profile.preferredTime &&
+        setPreferredTime((old) => ({
+          ...old,
+          value: business.profile.preferredTime,
+        }));
+      business.profile.submissionMessage &&
+        setSubmissionMessage((old) => ({
+          ...old,
+          value: business.profile.submissionMessage,
+        }));
     }
   }, [business.profile]);
 
@@ -260,22 +309,6 @@ export default function Profile() {
 
   const inputsAreValid = () => {
     let valid = true;
-
-    if (businessName.value === "") {
-      setBusinessName((old) => ({
-        ...old,
-        error: true,
-        helper: "Business name cannot be empty.",
-      }));
-      valid = false;
-    } else if (businessName.value.length < 3) {
-      setBusinessName((old) => ({
-        ...old,
-        error: true,
-        helper: "Business name is too short.",
-      }));
-      valid = false;
-    }
 
     if (businessType.value === "") {
       setBusinessType((old) => ({
@@ -387,6 +420,32 @@ export default function Profile() {
     return valid;
   };
 
+  const handleBusinessNameSubmit = (field) => {
+    if (status.businessName.value === "") {
+      setStatus((old) => {
+        const newStatus = { ...old };
+        newStatus[field] = {
+          ...old[field],
+          formattingError: true,
+          formattingMessage: "Business name cannot be empty.",
+        };
+        return newStatus;
+      });
+      return;
+    } else if (status.businessName.value.length < 3) {
+      setStatus((old) => {
+        const newStatus = { ...old };
+        newStatus[field] = {
+          ...old[field],
+          formattingError: true,
+          formattingMessage: "Business name is too short.",
+        };
+        return newStatus;
+      });
+      return;
+    }
+  };
+
   const encapsulate = () => {
     return {
       businessName: businessName.value,
@@ -472,11 +531,20 @@ export default function Profile() {
             type="text"
             required
             label="Business Name"
-            inputValue={businessName.value}
-            onChange={handleBusinessNameChange}
-            inputError={businessName.error}
-            icon={businessName.error ? "error" : ""}
-            iconMessage={businessName.helper}
+            inputValue={status.businessName.value}
+            onChange={(event) => {
+              handleChange(event, "businessName");
+            }}
+            onBlur={() => {
+              handleBusinessNameSubmit("businessName");
+            }}
+            inputError={status.businessName.formattingError}
+            icon={status.businessName.formattingError ? "error" : ""}
+            iconMessage={
+              status.businessName.formattingError
+                ? status.businessName.formattingMessage
+                : ""
+            }
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
@@ -591,7 +659,7 @@ export default function Profile() {
             rows={3}
             label="Submission Message"
             inputValue={submissionMessage.value}
-            onChange={handleBusinessNameChange}
+            onChange={handleSubmissionMessageChange}
             icon={""}
             iconMessage={""}
           />
