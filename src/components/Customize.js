@@ -804,7 +804,6 @@ const useClasses = makeStyles((theme) => ({
   },
   formContainer: {
     marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
   },
   animationContainer: {
     transition: "all 0.25s ease-out",
