@@ -34,279 +34,203 @@ export default function Profile() {
       formattingMessage: "",
       submissionStatus: "",
       submissionMessage: "",
+
+      properTitle: "Business name",
+
+      minLength: 3,
+    },
+    businessType: {
+      value: "",
+      formattingError: false,
+      formattingMessage: "",
+      submissionStatus: "",
+      submissionMessage: "",
+
+      properTitle: "Business type",
+
+      allowedFrom: ["Restaurant or Bar", "Store", "Other"],
+    },
+    addressLine1: {
+      value: "",
+      formattingError: false,
+      formattingMessage: "",
+      submissionStatus: "",
+      submissionMessage: "",
+
+      properTitle: "Address line 1",
+    },
+    addressLine2: {
+      value: "",
+      submissionStatus: "",
+      submissionMessage: "",
+
+      properTitle: "Address line 2",
+
+      notRequired: true,
+    },
+    city: {
+      value: "",
+      formattingError: false,
+      formattingMessage: "",
+      submissionStatus: "",
+      submissionMessage: "",
+
+      properTitle: "City",
+    },
+    province: {
+      value: "",
+      formattingError: false,
+      formattingMessage: "",
+      submissionStatus: "",
+      submissionMessage: "",
+
+      properTitle: "Province",
+
+      allowedFrom: [
+        "Alberta",
+        "British Columbia",
+        "Manitoba",
+        "New Brunswick",
+        "Newfoundland and Labrador",
+        "Northwest Territories",
+        "Nova Scotia",
+        "Nunavut",
+        "Ontario",
+        "Prince Edward Island",
+        "Quebec",
+        "Saskatchewan",
+        "Yukon",
+      ],
+    },
+    postalCode: {
+      value: "",
+      formattingError: false,
+      formattingMessage: "",
+      submissionStatus: "",
+      submissionMessage: "",
+
+      properTitle: "Postal code",
+
+      minLength: 6,
+    },
+    phoneNumber: {
+      value: "",
+      formattingError: false,
+      formattingMessage: "",
+      submissionStatus: "",
+      submissionMessage: "",
+
+      properTitle: "Phone number",
+
+      minLength: 10,
+    },
+    preferredTime: {
+      value: "",
+      formattingError: false,
+      formattingMessage: "",
+      submissionStatus: "",
+      submissionMessage: "",
+
+      properTitle: "Preferred time",
+
+      allowedFrom: ["Morning", "Afternoon", "Evening", "No Preferrence"],
+    },
+    submissionMessage: {
+      value: "",
+      submissionStatus: "",
+      submissionMessage: "",
+
+      properTitle: "Submission message",
+
+      notRequired: true,
     },
   });
 
-  const handleChange = (event, field) => {
+  useEffect(() => {
+    if (business.profile) {
+      setStatus((old) => ({
+        ...old,
+        businessName: {
+          ...old.businessName,
+          value: business.profile.businessName || "",
+        },
+        businessType: {
+          ...old.businessType,
+          value: business.profile.businessType || "",
+        },
+        addressLine1: {
+          ...old.addressLine1,
+          value: business.profile.address1 || "",
+        },
+        addressLine2: {
+          ...old.addressLine2,
+          value: business.profile.address2 || "",
+        },
+        city: {
+          ...old.city,
+          value: business.profile.city || "",
+        },
+        province: {
+          ...old.province,
+          value: business.profile.province || "",
+        },
+        postalCode: {
+          ...old.postalCode,
+          value: business.profile.postalCode || "",
+        },
+        phoneNumber: {
+          ...old.phoneNumber,
+          value: business.profile.phoneNumber || "",
+        },
+        preferredTime: {
+          ...old.preferredTime,
+          value: business.profile.preferredTime || "",
+        },
+        submissionMessage: {
+          ...old.submissionMessage,
+          value: business.profile.submissionMessage || "",
+        },
+      }));
+    }
+  }, [business.profile]);
+
+  const handleChange = (event, field, noFormatting = false) => {
     event.persist();
     setStatus((old) => {
       const newStatus = { ...old };
       newStatus[field] = {
         ...old[field],
         value: event.target.value,
-        formattingError: false,
-        formattingMessage: "",
       };
+      if (!noFormatting) {
+        newStatus[field] = {
+          ...newStatus[field],
+          formattingError: false,
+          formattingMessage: "",
+        };
+      }
       return newStatus;
     });
   };
 
-  const [businessName, setBusinessName] = useState({
-    value: "",
-    error: false,
-    helper: "",
-  });
-  const handleBusinessNameChange = (event) => {
-    event.persist();
-    setBusinessName(() => ({
-      value: event.target.value,
-      error: false,
-      helper: "",
-    }));
-  };
+  const handleSubmit = (field) => {
+    const { error, message } = isValidInput(field);
 
-  const [businessType, setBusinessType] = useState({
-    value: "",
-    error: false,
-    helper: "",
-  });
-  const handleBusinessTypeChange = (event) => {
-    event.persist();
-    setBusinessType(() => ({
-      value: event.target.value,
-      error: false,
-      helper: "",
-    }));
-  };
-
-  const [address1, setAddress1] = useState({
-    value: "",
-    error: false,
-    helper: "",
-  });
-  const handleAddress1Change = (event) => {
-    event.persist();
-    setAddress1(() => ({
-      value: event.target.value,
-      error: false,
-      helper: "",
-    }));
-  };
-
-  const [address2, setAddress2] = useState({ value: "" });
-  const handleAddress2Change = (event) => {
-    event.persist();
-    setAddress2(() => ({
-      value: event.target.value,
-    }));
-  };
-
-  const [city, setCity] = useState({ value: "", error: false, helper: "" });
-  const handleCityChange = (event) => {
-    event.persist();
-    setCity(() => ({
-      value: event.target.value,
-      error: false,
-      helper: "",
-    }));
-  };
-
-  const [province, setProvince] = useState({
-    value: "",
-    error: false,
-    helper: "",
-  });
-  const handleProvinceChange = (event) => {
-    event.persist();
-    setProvince(() => ({
-      value: event.target.value,
-      error: false,
-      helper: "",
-    }));
-  };
-
-  const [postalCode, setPostalCode] = useState({
-    value: "",
-    error: false,
-    helper: "",
-  });
-  const isValidPostalCode = (postalCode) => {
-    const digits = "0123456789";
-    const alph = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    for (let i = 0; i < postalCode.length; i++) {
-      if (i % 2 === 0) {
-        if (!alph.includes(postalCode.charAt(i).toUpperCase())) {
-          return false;
-        }
-      } else {
-        if (!digits.includes(postalCode.charAt(i).toUpperCase())) {
-          return false;
-        }
-      }
-    }
-    return true;
-  };
-  const handlePostalCodeChange = (event) => {
-    event.persist();
-    if (isValidPostalCode(event.target.value)) {
-      setPostalCode(() => ({
-        value: event.target.value.toUpperCase(),
-        error: false,
-        helper: "",
-      }));
+    if (error) {
+      setStatus((old) => {
+        const newStatus = { ...old };
+        newStatus[field] = {
+          ...old[field],
+          formattingError: true,
+          formattingMessage: message,
+        };
+        return newStatus;
+      });
+      return;
     }
   };
 
-  const [phoneNumber, setPhoneNumber] = useState({
-    value: "",
-    error: false,
-    helper: "",
-  });
-  const inNumber = (num) => {
-    const digits = "0123456789";
-    for (let i = 0; i < num.length; i++) {
-      if (!digits.includes(num.charAt(i))) {
-        return false;
-      }
-    }
-    return true;
-  };
-  const beautifyPhoneNumber = (phoneNumber) => {
-    let n = phoneNumber.trim().length;
-    if (n < 3) return phoneNumber;
-    else if (n === 3) return `(${phoneNumber}) `;
-    else if (n < 6)
-      return `(${phoneNumber.substring(0, 3)}) ${phoneNumber.substring(3)}`;
-    else if (n === 6)
-      return `(${phoneNumber.substring(0, 3)}) ${phoneNumber.substring(3)} `;
-    else
-      return `(${phoneNumber.substring(0, 3)}) ${phoneNumber.substring(
-        3,
-        6
-      )} ${phoneNumber.substring(6)}`;
-  };
-  const extractPhoneNumber = (beatifulPhoneNumber) => {
-    let result = "";
-    for (let i = 0; i < beatifulPhoneNumber.length; i++) {
-      let ch = beatifulPhoneNumber.charAt(i);
-      if (ch !== " " && ch !== "(" && ch !== ")") {
-        result += ch;
-      }
-    }
-    return result;
-  };
-  const handlePhoneNumberChange = (event) => {
-    event.persist();
-    let phoneNumber = extractPhoneNumber(event.target.value);
-    if (inNumber(phoneNumber)) {
-      setPhoneNumber(() => ({
-        value: phoneNumber,
-        error: false,
-        helper: "",
-      }));
-    }
-  };
-
-  const [preferredTime, setPreferredTime] = useState({
-    value: "",
-    error: false,
-    helper: "",
-  });
-  const handlePreferredTimeChange = (event) => {
-    event.persist();
-    setPreferredTime(() => ({
-      value: event.target.value,
-      error: false,
-      helper: "",
-    }));
-  };
-
-  const [submissionMessage, setSubmissionMessage] = useState({ value: "" });
-  const handleSubmissionMessageChange = (event) => {
-    event.persist();
-    setSubmissionMessage(() => ({
-      value: event.target.value,
-    }));
-  };
-
-  useEffect(() => {
-    if (business.profile) {
-      setStatus(() => ({
-        businessName: {
-          value: business.profile.businessName || "",
-          formattingError: false,
-          formattingMessage: "",
-          submissionStatus: "",
-          submissionMessage: "",
-        },
-      }));
-      business.profile.businessName &&
-        setBusinessName((old) => ({
-          ...old,
-          value: business.profile.businessName,
-        }));
-      business.profile.businessType &&
-        setBusinessType((old) => ({
-          ...old,
-          value: business.profile.businessType,
-        }));
-      business.profile.address1 &&
-        setAddress1((old) => ({ ...old, value: business.profile.address1 }));
-      business.profile.address2 &&
-        setAddress2((old) => ({ ...old, value: business.profile.address2 }));
-      business.profile.city &&
-        setCity((old) => ({ ...old, value: business.profile.city }));
-      business.profile.province &&
-        setProvince((old) => ({
-          ...old,
-          value: business.profile.province,
-        }));
-      business.profile.postalCode &&
-        setPostalCode((old) => ({
-          ...old,
-          value: business.profile.postalCode,
-        }));
-      business.profile.phoneNumber &&
-        setPhoneNumber((old) => ({
-          ...old,
-          value: business.profile.phoneNumber,
-        }));
-      business.profile.preferredTime &&
-        setPreferredTime((old) => ({
-          ...old,
-          value: business.profile.preferredTime,
-        }));
-      business.profile.submissionMessage &&
-        setSubmissionMessage((old) => ({
-          ...old,
-          value: business.profile.submissionMessage,
-        }));
-    }
-  }, [business.profile]);
-
-  const [submitStatus, setSubmitStatus] = useState({
-    value: "",
-    waiting: false,
-  });
-
-  const businessTypes = ["Restaurant or Bar", "Store", "Other"];
-  const canadianProvinces = [
-    "Alberta",
-    "British Columbia",
-    "Manitoba",
-    "New Brunswick",
-    "Newfoundland and Labrador",
-    "Northwest Territories",
-    "Nova Scotia",
-    "Nunavut",
-    "Ontario",
-    "Prince Edward Island",
-    "Quebec",
-    "Saskatchewan",
-    "Yukon",
-  ];
-  const preferredTimes = ["Morning", "Afternoon", "Evening", "No Preferrence"];
-
+  /*
   const inputsAreValid = () => {
     let valid = true;
 
@@ -419,33 +343,48 @@ export default function Profile() {
 
     return valid;
   };
+  */
 
-  const handleBusinessNameSubmit = (field) => {
-    if (status.businessName.value === "") {
-      setStatus((old) => {
-        const newStatus = { ...old };
-        newStatus[field] = {
-          ...old[field],
-          formattingError: true,
-          formattingMessage: "Business name cannot be empty.",
+  const isValidInput = (field) => {
+    if (status[field].notRequired) {
+      return {
+        error: false,
+        message: null,
+      };
+    } else if (
+      typeof status[field].value === "string" &&
+      status[field].value.length === 0
+    ) {
+      return {
+        error: true,
+        message: `${status[field].properTitle} cannot be empty.`,
+      };
+    } else if (status[field].allowedFrom) {
+      if (
+        status[field].value < 0 ||
+        status[field].value >= status[field].allowedFrom
+      ) {
+        return {
+          error: true,
+          message: `${status[field].properTitle} is invalid.`,
         };
-        return newStatus;
-      });
-      return;
-    } else if (status.businessName.value.length < 3) {
-      setStatus((old) => {
-        const newStatus = { ...old };
-        newStatus[field] = {
-          ...old[field],
-          formattingError: true,
-          formattingMessage: "Business name is too short.",
+      }
+    } else if (status[field].minLength) {
+      if (status[field].value.length < status[field].minLength) {
+        return {
+          error: true,
+          message: `${status[field].properTitle} is too short.`,
         };
-        return newStatus;
-      });
-      return;
+      }
     }
+
+    return {
+      error: false,
+      message: null,
+    };
   };
 
+  /*
   const encapsulate = () => {
     return {
       businessName: businessName.value,
@@ -507,16 +446,12 @@ export default function Profile() {
       }));
     }
   };
+  */
 
   const classes = useClasses();
   return (
     <div className={classes.root}>
-      <Typography
-        variant="body1"
-        onClick={() => {
-          setBusinessType((old) => ({ ...old, error: !old.error }));
-        }}
-      >
+      <Typography variant="body1">
         You can change the following setting. We will store them as you are
         editing.
       </Typography>
@@ -536,30 +471,49 @@ export default function Profile() {
               handleChange(event, "businessName");
             }}
             onBlur={() => {
-              handleBusinessNameSubmit("businessName");
+              handleSubmit("businessName");
             }}
-            inputError={status.businessName.formattingError}
-            icon={status.businessName.formattingError ? "error" : ""}
+            inputError={
+              status.businessName.formattingError ||
+              status.businessName.submissionStatus === "error"
+            }
+            icon={status.businessName.formattingError ? "warning" : ""}
+            iconId={status.businessName.properTitle}
             iconMessage={
               status.businessName.formattingError
                 ? status.businessName.formattingMessage
                 : ""
             }
+            iconIsButton={false}
+            onIconClick={() => {}}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <IconedInputField
             type="select"
             required
-            items={businessTypes}
+            items={status.businessType.allowedFrom}
             label="Business Type"
-            inputValue={businessType.value}
-            onChange={handleBusinessTypeChange}
-            inputError={businessType.error}
-            icon={businessType.error ? "error" : ""}
-            iconIsButton
+            inputValue={status.businessType.value}
+            onChange={(event) => {
+              handleChange(event, "businessType");
+            }}
+            onBlur={() => {
+              handleSubmit("businessType");
+            }}
+            inputError={
+              status.businessType.formattingError ||
+              status.businessType.submissionStatus === "error"
+            }
+            icon={status.businessType.formattingError ? "warning" : ""}
+            iconId={status.businessType.properTitle}
+            iconMessage={
+              status.businessType.formattingError
+                ? status.businessType.formattingMessage
+                : ""
+            }
+            iconIsButton={false}
             onIconClick={() => {}}
-            iconMessage={"businessType.helper"}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -567,19 +521,41 @@ export default function Profile() {
             type="text"
             required
             label="Address Line 1"
-            inputValue={address1.value}
-            onChange={handleAddress1Change}
-            inputError={address1.error}
-            icon={address1.error ? "error" : ""}
-            iconMessage={address1.helper}
+            inputValue={status.addressLine1.value}
+            onChange={(event) => {
+              handleChange(event, "addressLine1");
+            }}
+            onBlur={() => {
+              handleSubmit("addressLine1");
+            }}
+            inputError={
+              status.addressLine1.formattingError ||
+              status.addressLine1.submissionStatus === "error"
+            }
+            icon={status.addressLine1.formattingError ? "warning" : ""}
+            iconId={status.addressLine1.properTitle}
+            iconMessage={
+              status.addressLine1.formattingError
+                ? status.addressLine1.formattingMessage
+                : ""
+            }
+            iconIsButton={false}
+            onIconClick={() => {}}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <IconedInputField
             type="text"
             label="Address Line 2"
-            inputValue={address2.value}
-            onChange={handleAddress2Change}
+            inputValue={status.addressLine2.value}
+            onChange={(event) => {
+              handleChange(event, "addressLine2", true);
+            }}
+            onBlur={() => {
+              handleSubmit("addressLine2");
+            }}
+            iconIsButton={false}
+            onIconClick={() => {}}
           />
         </Grid>
         <Grid item xs={6} sm={4} md={2}>
@@ -587,26 +563,52 @@ export default function Profile() {
             type="text"
             required
             label="City"
-            inputValue={city.value}
-            onChange={handleCityChange}
-            inputError={city.error}
-            icon={city.error ? "error" : ""}
-            iconMessage={city.helper}
+            inputValue={status.city.value}
+            onChange={(event) => {
+              handleChange(event, "city");
+            }}
+            onBlur={() => {
+              handleSubmit("city");
+            }}
+            inputError={
+              status.city.formattingError ||
+              status.city.submissionStatus === "error"
+            }
+            icon={status.city.formattingError ? "warning" : ""}
+            iconId={status.city.properTitle}
+            iconMessage={
+              status.city.formattingError ? status.city.formattingMessage : ""
+            }
+            iconIsButton={false}
+            onIconClick={() => {}}
           />
         </Grid>
         <Grid item xs={6} sm={4} md={2}>
           <IconedInputField
             type="select"
             required
-            items={canadianProvinces}
+            items={status.province.allowedFrom}
             label="Province"
-            inputValue={province.value}
-            onChange={handleProvinceChange}
-            inputError={province.error}
-            icon={province.error ? "error" : ""}
-            iconIsButton
+            inputValue={status.province.value}
+            onChange={(event) => {
+              handleChange(event, "province");
+            }}
+            onBlur={() => {
+              handleSubmit("province");
+            }}
+            inputError={
+              status.province.formattingError ||
+              status.province.submissionStatus === "error"
+            }
+            icon={status.province.formattingError ? "warning" : ""}
+            iconId={status.province.properTitle}
+            iconMessage={
+              status.province.formattingError
+                ? status.province.formattingMessage
+                : ""
+            }
+            iconIsButton={false}
             onIconClick={() => {}}
-            iconMessage={"businessType.helper"}
           />
         </Grid>
         <Grid item xs={6} sm={4} md={2}>
@@ -614,13 +616,28 @@ export default function Profile() {
             type="text"
             required
             label="Postal Code"
-            inputProps={{ maxLength: 6 }}
+            inputValue={status.postalCode.value}
             placeholder="A1A1A1"
-            inputValue={postalCode.value}
-            onChange={handlePostalCodeChange}
-            inputError={postalCode.error}
-            icon={postalCode.error ? "error" : ""}
-            iconMessage={postalCode.helper}
+            inputProps={{ maxLength: 6 }}
+            onChange={(event) => {
+              handleChange(event, "postalCode");
+            }}
+            onBlur={() => {
+              handleSubmit("postalCode");
+            }}
+            inputError={
+              status.postalCode.formattingError ||
+              status.postalCode.submissionStatus === "error"
+            }
+            icon={status.postalCode.formattingError ? "warning" : ""}
+            iconId={status.postalCode.properTitle}
+            iconMessage={
+              status.postalCode.formattingError
+                ? status.postalCode.formattingMessage
+                : ""
+            }
+            iconIsButton={false}
+            onIconClick={() => {}}
           />
         </Grid>
         <Grid item xs={6} md={3}>
@@ -628,28 +645,56 @@ export default function Profile() {
             type="text"
             required
             label="Phone Number"
-            inputProps={{ maxLength: 14 }}
-            placeholder="(111) 111 1111"
-            inputValue={beautifyPhoneNumber(phoneNumber.value)}
-            onChange={handlePhoneNumberChange}
-            inputError={phoneNumber.error}
-            icon={phoneNumber.error ? "error" : ""}
-            iconMessage={phoneNumber.helper}
+            inputValue={status.phoneNumber.value}
+            placeholder="1111111111"
+            inputProps={{ maxLength: 10 }}
+            onChange={(event) => {
+              handleChange(event, "phoneNumber");
+            }}
+            onBlur={() => {
+              handleSubmit("phoneNumber");
+            }}
+            inputError={
+              status.phoneNumber.formattingError ||
+              status.phoneNumber.submissionStatus === "error"
+            }
+            icon={status.phoneNumber.formattingError ? "warning" : ""}
+            iconId={status.phoneNumber.properTitle}
+            iconMessage={
+              status.phoneNumber.formattingError
+                ? status.phoneNumber.formattingMessage
+                : ""
+            }
+            iconIsButton={false}
+            onIconClick={() => {}}
           />
         </Grid>
         <Grid item xs={6} md={3}>
           <IconedInputField
             type="select"
             required
-            items={preferredTimes}
-            label="Preferred Time"
-            inputValue={preferredTime.value}
-            onChange={handlePreferredTimeChange}
-            inputError={preferredTime.error}
-            icon={preferredTime.error ? "error" : ""}
-            iconIsButton
+            items={status.preferredTime.allowedFrom}
+            label="Preferreed Time"
+            inputValue={status.preferredTime.value}
+            onChange={(event) => {
+              handleChange(event, "preferredTime");
+            }}
+            onBlur={() => {
+              handleSubmit("preferredTime");
+            }}
+            inputError={
+              status.preferredTime.formattingError ||
+              status.preferredTime.submissionStatus === "error"
+            }
+            icon={status.preferredTime.formattingError ? "warning" : ""}
+            iconId={status.preferredTime.properTitle}
+            iconMessage={
+              status.preferredTime.formattingError
+                ? status.preferredTime.formattingMessage
+                : ""
+            }
+            iconIsButton={false}
             onIconClick={() => {}}
-            iconMessage={"businessType.helper"}
           />
         </Grid>
         <Grid item xs={12}>
@@ -658,298 +703,16 @@ export default function Profile() {
             multiline
             rows={3}
             label="Submission Message"
-            inputValue={submissionMessage.value}
-            onChange={handleSubmissionMessageChange}
-            icon={""}
-            iconMessage={""}
+            inputValue={status.submissionMessage.value}
+            onChange={(event) => {
+              handleChange(event, "submissionMessage", true);
+            }}
+            onBlur={() => {
+              handleSubmit("submissionMessage");
+            }}
+            iconIsButton={false}
+            onIconClick={() => {}}
           />
-        </Grid>
-      </Grid>
-    </div>
-  );
-  return (
-    <div className={classes.root}>
-      <Grid container direction="row">
-        <Grid item xs={12}>
-          <Grid
-            container
-            direction="row"
-            alignItems="center"
-            style={{
-              paddingLeft: 8,
-              paddingRight: 8,
-              paddingTop: 8,
-              borderColor: "black",
-              borderBottom: "solid",
-              borderWidth: 1,
-            }}
-          >
-            <Grid item xs={10}>
-              <Typography variant="body1">Business Information</Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Grid container direction="row" spacing={1} style={{ padding: 8 }}>
-            <Grid item xs={12} sm={8}>
-              <TextField
-                required
-                InputLabelProps={{
-                  classes: {
-                    asterisk: classes.asterisk,
-                  },
-                }}
-                fullWidth
-                label="Name"
-                value={businessName.value}
-                error={businessName.error}
-                helperText={businessName.helper}
-                onChange={handleBusinessNameChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <FormControl fullWidth required error={businessType.error}>
-                <InputLabel
-                  classes={{
-                    asterisk: classes.asterisk,
-                  }}
-                >
-                  Type
-                </InputLabel>
-                <Select
-                  value={businessType.value}
-                  onChange={handleBusinessTypeChange}
-                >
-                  <MenuItem value={0}>Restaurant or Bar</MenuItem>
-                  <MenuItem value={1}>Store</MenuItem>
-                  <MenuItem value={100}>Other</MenuItem>
-                </Select>
-                <FormHelperText>{businessType.helper}</FormHelperText>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Grid
-            container
-            direction="row"
-            alignItems="center"
-            style={{
-              paddingLeft: 8,
-              paddingRight: 8,
-              paddingTop: 8,
-              borderColor: "black",
-              borderBottom: "solid",
-              borderWidth: 1,
-            }}
-          >
-            <Grid item xs={10}>
-              <Typography variant="body1">Contact Information</Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Grid container direction="row" spacing={1} style={{ padding: 8 }}>
-            <Grid item xs={12}>
-              <TextField
-                required
-                InputLabelProps={{
-                  classes: {
-                    asterisk: classes.asterisk,
-                  },
-                }}
-                fullWidth
-                label="Address Line 1"
-                value={address1.value}
-                error={address1.error}
-                helperText={address1.helper}
-                onChange={handleAddress1Change}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Address Line 2"
-                value={address2.value}
-                onChange={handleAddress2Change}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Grid container direction="row" spacing={1}>
-                <Grid item xs={6} sm={4}>
-                  <TextField
-                    required
-                    InputLabelProps={{
-                      classes: {
-                        asterisk: classes.asterisk,
-                      },
-                    }}
-                    fullWidth
-                    label="City"
-                    value={city.value}
-                    error={city.error}
-                    helperText={city.helper}
-                    onChange={handleCityChange}
-                  />
-                </Grid>
-                <Grid item xs={6} sm={4}>
-                  <FormControl required fullWidth error={province.error}>
-                    <InputLabel
-                      classes={{
-                        asterisk: classes.asterisk,
-                      }}
-                    >
-                      Province
-                    </InputLabel>
-                    <Select
-                      value={province.value}
-                      onChange={handleProvinceChange}
-                    >
-                      <MenuItem value={0}>Alberta</MenuItem>
-                      <MenuItem value={1}>British Columbia</MenuItem>
-                      <MenuItem value={2}>Manitoba</MenuItem>
-                      <MenuItem value={3}>New Brunswick</MenuItem>
-                      <MenuItem value={4}>Newfoundland and Labrador</MenuItem>
-                      <MenuItem value={5}>Northwest Territories</MenuItem>
-                      <MenuItem value={6}>Nova Scotia</MenuItem>
-                      <MenuItem value={7}>Nunavut</MenuItem>
-                      <MenuItem value={8}>Ontario</MenuItem>
-                      <MenuItem value={9}>Prince Edward Island</MenuItem>
-                      <MenuItem value={10}>Quebec</MenuItem>
-                      <MenuItem value={11}>Saskatchewan</MenuItem>
-                      <MenuItem value={12}>Yukon</MenuItem>
-                    </Select>
-                    <FormHelperText>{province.helper}</FormHelperText>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={6} sm={4}>
-                  <TextField
-                    required
-                    InputLabelProps={{
-                      classes: {
-                        asterisk: classes.asterisk,
-                      },
-                    }}
-                    fullWidth
-                    inputProps={{ maxLength: 6 }}
-                    placeholder="A1A1A1"
-                    label="Postal Code"
-                    value={postalCode.value}
-                    error={postalCode.error}
-                    helperText={postalCode.helper}
-                    onChange={handlePostalCodeChange}
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={12}>
-              <Grid container direction="row" spacing={1}>
-                <Grid item xs={6}>
-                  <TextField
-                    required
-                    InputLabelProps={{
-                      classes: {
-                        asterisk: classes.asterisk,
-                      },
-                    }}
-                    fullWidth
-                    inputProps={{ maxLength: 14 }}
-                    placeholder="(111) 111 1111"
-                    label="Phone Number"
-                    value={beautifyPhoneNumber(phoneNumber.value)}
-                    error={phoneNumber.error}
-                    helperText={phoneNumber.helper}
-                    onChange={handlePhoneNumberChange}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <FormControl required fullWidth error={preferredTime.error}>
-                    <InputLabel
-                      classes={{
-                        asterisk: classes.asterisk,
-                      }}
-                    >
-                      Preferred Time
-                    </InputLabel>
-                    <Select
-                      value={preferredTime.value}
-                      onChange={handlePreferredTimeChange}
-                    >
-                      <MenuItem value={0}>Morning (09:00-11:59)</MenuItem>
-                      <MenuItem value={1}>Afternoon (12:00-16:59)</MenuItem>
-                      <MenuItem value={2}>Evening (17:00-20:59)</MenuItem>
-                      <MenuItem value={100}>No Preference</MenuItem>
-                    </Select>
-                    <FormHelperText>{preferredTime.helper}</FormHelperText>
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Grid
-            container
-            direction="row"
-            alignItems="center"
-            style={{
-              paddingLeft: 8,
-              paddingRight: 8,
-              paddingTop: 8,
-              borderColor: "black",
-              borderBottom: "solid",
-              borderWidth: 1,
-            }}
-          >
-            <Grid item xs={10}>
-              <Typography variant="body1">Customization</Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Grid container direction="row" spacing={1} style={{ padding: 8 }}>
-            <Grid item xs={12}>
-              <TextField
-                multiline
-                fullWidth
-                label="Submission Message"
-                value={submissionMessage.value}
-                placeholder="Thank you for helping stop the spread of Covid-19. Enjoy your experience."
-                helperText="The message patrons will see after they have added their
-        information."
-                onChange={handleSubmissionMessageChange}
-              />
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid item xs={12} style={{ padding: 8 }}>
-          <Grid container direction="row" spacing={2} alignItems="center">
-            <Grid item className={classes.buttonWrapper}>
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={submitStatus.waiting}
-                onClick={handleSubmit}
-              >
-                Submit
-              </Button>
-              {submitStatus.waiting && (
-                <CircularProgress
-                  size={24}
-                  className={classes.buttonProgress}
-                />
-              )}
-            </Grid>
-            <Grid item>
-              <Typography variant="body2">{submitStatus.value}</Typography>
-            </Grid>
-          </Grid>
         </Grid>
       </Grid>
     </div>
@@ -959,12 +722,12 @@ export default function Profile() {
 const IconedInputField = (props) => {
   const {
     type,
-    required,
     label,
     items,
     inputValue,
     inputError,
     icon,
+    iconId,
     iconIsButton,
     onIconClick,
     iconMessage,
@@ -978,7 +741,6 @@ const IconedInputField = (props) => {
       <TextField
         label={label}
         variant="outlined"
-        required={required}
         InputLabelProps={{
           classes: {
             asterisk: classes.asterisk,
@@ -1001,7 +763,6 @@ const IconedInputField = (props) => {
             disableScrollLock: true,
           },
         }}
-        required={required}
         InputLabelProps={{
           classes: {
             asterisk: classes.asterisk,
@@ -1028,19 +789,23 @@ const IconedInputField = (props) => {
 
   const iconContainer = useRef(null);
   useEffect(() => {
-    if (icon === "error") {
+    if (icon === "error" || icon === "warning") {
       setIconProperties((old) => ({
         ...old,
         opacity: 1,
         size: 40,
       }));
-      const errorAnimation = require("../animations/error.json");
+      const animation =
+        icon === "error"
+          ? require("../animations/error.json")
+          : require("../animations/warning.json");
       Lottie.loadAnimation({
+        name: iconId,
         container: iconContainer.current,
         renderer: "svg",
         loop: false,
         autoplay: true,
-        animationData: errorAnimation,
+        animationData: animation,
       });
     } else if (icon === "done") {
       setIconProperties((old) => ({
@@ -1050,6 +815,7 @@ const IconedInputField = (props) => {
       }));
       const errorAnimation = require("../animations/done.json");
       Lottie.loadAnimation({
+        name: iconId,
         container: iconContainer.current,
         renderer: "svg",
         loop: false,
@@ -1062,7 +828,7 @@ const IconedInputField = (props) => {
           size: 0,
         }));
         setTimeout(() => {
-          Lottie.destroy();
+          Lottie.destroy(iconId);
         }, 250);
       });
     } else {
@@ -1072,10 +838,10 @@ const IconedInputField = (props) => {
         size: 0,
       }));
       setTimeout(() => {
-        Lottie.destroy();
+        Lottie.destroy(iconId);
       }, 250);
     }
-  }, [icon]);
+  }, [icon, iconId]);
 
   return (
     <div
