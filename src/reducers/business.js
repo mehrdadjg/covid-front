@@ -14,8 +14,10 @@ export default function businessReducer(state = initial_business, action) {
       return action.payload;
 
     case "SET_PROFILE":
-      setCookie("business_logged_in", { ...state, profile: action.payload });
-      return { ...state, profile: action.payload };
+      const newProfile = { ...state.profile };
+      newProfile[action.field] = action.value;
+      setCookie("business_logged_in", { ...state, profile: newProfile });
+      return { ...state, profile: newProfile };
 
     case "VERIFY_EMAIL":
       setCookie("business_logged_in", { ...state, emailIsVerified: true });

@@ -6,8 +6,13 @@ const resetBusiness = () => {
   return { type: "RESET_BUSINESS" };
 };
 
-const setProfile = (profile) => {
-  return { type: "SET_PROFILE", payload: profile };
+/**
+ * Updates the given field of the profile to its new value.
+ * @param {string}          field
+ * @param {string | number} value
+ */
+const setProfile = (field, value) => {
+  return { type: "SET_PROFILE", field: field, value: value };
 };
 
 const verifyEmail = () => {

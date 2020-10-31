@@ -6,15 +6,9 @@ import Lottie from "lottie-web";
 import { setProfile } from "../actions/business";
 
 import {
-  Button,
-  CircularProgress,
-  FormControl,
-  FormHelperText,
   Grid,
   IconButton,
-  InputLabel,
   MenuItem,
-  Select,
   TextField,
   Tooltip,
   Typography,
@@ -27,9 +21,15 @@ export default function Profile() {
   const auth = useSelector((state) => state.auth);
   const business = useSelector((state) => state.business);
 
+  /**
+   * Contains the entire state of the form, including the values, formatting information,
+   * submission information, and each field's restrictions; i.e. length or list or not
+   * being required.
+   */
   const [status, setStatus] = useState({
     businessName: {
       value: "",
+      lastSubmittedValue: "",
       formattingError: false,
       formattingMessage: "",
       submissionStatus: "",
@@ -41,6 +41,7 @@ export default function Profile() {
     },
     businessType: {
       value: "",
+      lastSubmittedValue: "",
       formattingError: false,
       formattingMessage: "",
       submissionStatus: "",
@@ -52,6 +53,7 @@ export default function Profile() {
     },
     addressLine1: {
       value: "",
+      lastSubmittedValue: "",
       formattingError: false,
       formattingMessage: "",
       submissionStatus: "",
@@ -61,6 +63,7 @@ export default function Profile() {
     },
     addressLine2: {
       value: "",
+      lastSubmittedValue: "",
       submissionStatus: "",
       submissionMessage: "",
 
@@ -70,6 +73,7 @@ export default function Profile() {
     },
     city: {
       value: "",
+      lastSubmittedValue: "",
       formattingError: false,
       formattingMessage: "",
       submissionStatus: "",
@@ -79,6 +83,7 @@ export default function Profile() {
     },
     province: {
       value: "",
+      lastSubmittedValue: "",
       formattingError: false,
       formattingMessage: "",
       submissionStatus: "",
@@ -104,6 +109,7 @@ export default function Profile() {
     },
     postalCode: {
       value: "",
+      lastSubmittedValue: "",
       formattingError: false,
       formattingMessage: "",
       submissionStatus: "",
@@ -115,6 +121,7 @@ export default function Profile() {
     },
     phoneNumber: {
       value: "",
+      lastSubmittedValue: "",
       formattingError: false,
       formattingMessage: "",
       submissionStatus: "",
@@ -126,6 +133,7 @@ export default function Profile() {
     },
     preferredTime: {
       value: "",
+      lastSubmittedValue: "",
       formattingError: false,
       formattingMessage: "",
       submissionStatus: "",
@@ -137,6 +145,7 @@ export default function Profile() {
     },
     submissionMessage: {
       value: "",
+      lastSubmittedValue: "",
       submissionStatus: "",
       submissionMessage: "",
 
@@ -146,54 +155,134 @@ export default function Profile() {
     },
   });
 
+  /**
+   * Uses the business.profile object from redux to fill in the fields.
+   *
+   * @see business.profile
+   */
   useEffect(() => {
     if (business.profile) {
       setStatus((old) => ({
         ...old,
         businessName: {
           ...old.businessName,
-          value: business.profile.businessName || "",
+          value:
+            business.profile.businessName !== undefined
+              ? business.profile.businessName
+              : "",
+          lastSubmittedValue:
+            business.profile.businessName !== undefined
+              ? business.profile.businessName
+              : "",
         },
         businessType: {
           ...old.businessType,
-          value: business.profile.businessType || "",
+          value:
+            business.profile.businessType !== undefined
+              ? business.profile.businessType
+              : "",
+          lastSubmittedValue:
+            business.profile.businessType !== undefined
+              ? business.profile.businessType
+              : "",
         },
         addressLine1: {
           ...old.addressLine1,
-          value: business.profile.address1 || "",
+          value:
+            business.profile.addressLine1 !== undefined
+              ? business.profile.addressLine1
+              : "",
+          lastSubmittedValue:
+            business.profile.addressLine1 !== undefined
+              ? business.profile.addressLine1
+              : "",
         },
         addressLine2: {
           ...old.addressLine2,
-          value: business.profile.address2 || "",
+          value:
+            business.profile.addressLine2 !== undefined
+              ? business.profile.addressLine2
+              : "",
+          lastSubmittedValue:
+            business.profile.addressLine2 !== undefined
+              ? business.profile.addressLine2
+              : "",
         },
         city: {
           ...old.city,
-          value: business.profile.city || "",
+          value:
+            business.profile.city !== undefined ? business.profile.city : "",
+          lastSubmittedValue:
+            business.profile.city !== undefined ? business.profile.city : "",
         },
         province: {
           ...old.province,
-          value: business.profile.province || "",
+          value:
+            business.profile.province !== undefined
+              ? business.profile.province
+              : "",
+          lastSubmittedValue:
+            business.profile.province !== undefined
+              ? business.profile.province
+              : "",
         },
         postalCode: {
           ...old.postalCode,
-          value: business.profile.postalCode || "",
+          value:
+            business.profile.postalCode !== undefined
+              ? business.profile.postalCode
+              : "",
+          lastSubmittedValue:
+            business.profile.postalCode !== undefined
+              ? business.profile.postalCode
+              : "",
         },
         phoneNumber: {
           ...old.phoneNumber,
-          value: business.profile.phoneNumber || "",
+          value:
+            business.profile.phoneNumber !== undefined
+              ? business.profile.phoneNumber
+              : "",
+          lastSubmittedValue:
+            business.profile.phoneNumber !== undefined
+              ? business.profile.phoneNumber
+              : "",
         },
         preferredTime: {
           ...old.preferredTime,
-          value: business.profile.preferredTime || "",
+          value:
+            business.profile.preferredTime !== undefined
+              ? business.profile.preferredTime
+              : "",
+          lastSubmittedValue:
+            business.profile.preferredTime !== undefined
+              ? business.profile.preferredTime
+              : "",
         },
         submissionMessage: {
           ...old.submissionMessage,
-          value: business.profile.submissionMessage || "",
+          value:
+            business.profile.submissionMessage !== undefined
+              ? business.profile.submissionMessage
+              : "",
+          lastSubmittedValue:
+            business.profile.submissionMessage !== undefined
+              ? business.profile.submissionMessage
+              : "",
         },
       }));
     }
   }, [business.profile]);
 
+  /**
+   * Handles the changes to status.
+   *
+   * @param {object}  event         The relevant event that caused this function to be called.
+   * @param {string}  field         The field that should be changed. Note that the name of
+   *                                this field must match the keys in the status.
+   * @param {boolean} noFormatting  If set to true, formatting information will not be stored
+   *                                for this field.
+   */
   const handleChange = (event, field, noFormatting = false) => {
     event.persist();
     setStatus((old) => {
@@ -201,6 +290,10 @@ export default function Profile() {
       newStatus[field] = {
         ...old[field],
         value: event.target.value,
+        submissionStatus:
+          old[field].submissionStatus === "done"
+            ? ""
+            : old[field].submissionStatus,
       };
       if (!noFormatting) {
         newStatus[field] = {
@@ -213,7 +306,20 @@ export default function Profile() {
     });
   };
 
+  /**
+   * Handles the submission of the field values to the back-end.
+   * If there are foratting errors, the appropriate fields will
+   * be updated in status and no information will be sent to the
+   * back-end.
+   * Otherwise, the information will be sent to the back-end and
+   * based on the success of this operation the status will be
+   * updated and the business.profile reducer is updated.
+   *
+   * @param {string} field The field that must be submitted to the back-end.
+   */
   const handleSubmit = (field) => {
+    if (status[field].value === status[field].lastSubmittedValue) return;
+
     const { error, message } = isValidInput(field);
 
     if (error) {
@@ -227,124 +333,70 @@ export default function Profile() {
         return newStatus;
       });
       return;
+    } else {
+      const values = {};
+      values[field] = status[field].value;
+      fetch("/business/profile", {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+          Authorization: `${auth.type} ${auth.value}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ values }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.code === 0) {
+            setStatus((old) => {
+              const newStatus = { ...old };
+              newStatus[field] = {
+                ...old[field],
+                submissionStatus: "done",
+                submissionMessage: "Stored successfully.",
+                lastSubmittedValue: old[field].value,
+              };
+              return newStatus;
+            });
+            dispatcher(setProfile(field, status[field].value));
+          } else {
+            setStatus((old) => {
+              const newStatus = { ...old };
+              newStatus[field] = {
+                ...old[field],
+                submissionStatus: "error",
+                submissionMessage: "Something went wrong. Try again later.",
+              };
+              return newStatus;
+            });
+          }
+        })
+        .catch((error) => {
+          setStatus((old) => {
+            const newStatus = { ...old };
+            newStatus[field] = {
+              ...old[field],
+              submissionStatus: "error",
+              submissionMessage:
+                "Something went wrong. Contact the administrator.",
+            };
+            return newStatus;
+          });
+        });
     }
   };
 
-  /*
-  const inputsAreValid = () => {
-    let valid = true;
-
-    if (businessType.value === "") {
-      setBusinessType((old) => ({
-        ...old,
-        error: true,
-        helper: "Business type cannot be empty.",
-      }));
-      valid = false;
-    } else if (
-      businessType.value >= 0 &&
-      businessType.value < businessTypes.length
-    ) {
-      setBusinessType((old) => ({
-        ...old,
-        error: true,
-        helper: "Business type is invalid.",
-      }));
-      valid = false;
-    }
-
-    if (address1.value === "") {
-      setAddress1((old) => ({
-        ...old,
-        error: true,
-        helper: "Address cannot be empty.",
-      }));
-      valid = false;
-    }
-
-    if (city.value === "") {
-      setCity((old) => ({
-        ...old,
-        error: true,
-        helper: "City cannot be empty.",
-      }));
-      valid = false;
-    }
-
-    if (province.value === "") {
-      setProvince((old) => ({
-        ...old,
-        error: true,
-        helper: "Province cannot be empty.",
-      }));
-      valid = false;
-    } else if (
-      province.value > 0 &&
-      province.value < canadianProvinces.length
-    ) {
-      setProvince((old) => ({
-        ...old,
-        error: true,
-        helper: "Province is invalid.",
-      }));
-      valid = false;
-    }
-
-    if (postalCode.value === "") {
-      setPostalCode((old) => ({
-        ...old,
-        error: true,
-        helper: "Postal code cannot be empty.",
-      }));
-      valid = false;
-    } else if (postalCode.value.length < 6) {
-      setPostalCode((old) => ({
-        ...old,
-        error: true,
-        helper: "Postal code is invalid.",
-      }));
-      valid = false;
-    }
-
-    if (phoneNumber.value === "") {
-      setPhoneNumber((old) => ({
-        ...old,
-        error: true,
-        helper: "Phone number cannot be empty.",
-      }));
-      valid = false;
-    } else if (phoneNumber.value.length < 10) {
-      setPhoneNumber((old) => ({
-        ...old,
-        error: true,
-        helper: "Phone number is invalid.",
-      }));
-      valid = false;
-    }
-
-    if (preferredTime.value === "") {
-      setPreferredTime((old) => ({
-        ...old,
-        error: true,
-        helper: "Preferred time cannot be empty.",
-      }));
-      valid = false;
-    } else if (
-      preferredTime.value >= 0 &&
-      preferredTime.value < preferredTimes.length
-    ) {
-      setPreferredTime((old) => ({
-        ...old,
-        error: true,
-        helper: "Preferred time is invalid.",
-      }));
-      valid = false;
-    }
-
-    return valid;
-  };
-  */
-
+  /**
+   * Given a field, determines whether the value of that field is valid
+   * or not.
+   *
+   * @see     {status.$.notRequired}
+   * @see     {status.$.allowedFrom}
+   * @see     {status.$.minLength}
+   *
+   * @param   {string} field
+   * @returns {object}
+   */
   const isValidInput = (field) => {
     if (status[field].notRequired) {
       return {
@@ -384,70 +436,6 @@ export default function Profile() {
     };
   };
 
-  /*
-  const encapsulate = () => {
-    return {
-      businessName: businessName.value,
-      businessType: businessType.value,
-      address1: address1.value,
-      address2: address2.value,
-      city: city.value,
-      province: province.value,
-      postalCode: postalCode.value,
-      phoneNumber: phoneNumber.value,
-      preferredTime: preferredTime.value,
-      submissionMessage: submissionMessage.value,
-    };
-  };
-
-  const handleSubmit = () => {
-    if (inputsAreValid()) {
-      setSubmitStatus((old) => ({
-        value: "Please wait.",
-        waiting: true,
-      }));
-      const formValues = encapsulate();
-
-      fetch("/business/profile", {
-        method: "POST",
-        cache: "no-cache",
-        headers: {
-          Authorization: `${auth.type} ${auth.value}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ values: formValues }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          if (data.code === 0) {
-            dispatcher(setProfile(formValues));
-            setSubmitStatus(() => ({
-              value: "Profile was successfully saved.",
-              waiting: false,
-            }));
-          } else {
-            setSubmitStatus(() => ({
-              value: "Something went wrong. Please try again later.",
-              waiting: false,
-            }));
-          }
-        })
-        .catch(() => {
-          setSubmitStatus(() => ({
-            value: "Something went wrong. Please contact the administrator.",
-            waiting: false,
-          }));
-        });
-    } else {
-      setSubmitStatus((old) => ({
-        ...old,
-        value: "Please fix the errors.",
-      }));
-    }
-  };
-  */
-
   const classes = useClasses();
   return (
     <div className={classes.root}>
@@ -477,12 +465,16 @@ export default function Profile() {
               status.businessName.formattingError ||
               status.businessName.submissionStatus === "error"
             }
-            icon={status.businessName.formattingError ? "warning" : ""}
+            icon={
+              status.businessName.formattingError
+                ? "warning"
+                : status.businessName.submissionStatus
+            }
             iconId={status.businessName.properTitle}
             iconMessage={
               status.businessName.formattingError
                 ? status.businessName.formattingMessage
-                : ""
+                : status.businessName.submissionMessage
             }
             iconIsButton={false}
             onIconClick={() => {}}
@@ -505,12 +497,16 @@ export default function Profile() {
               status.businessType.formattingError ||
               status.businessType.submissionStatus === "error"
             }
-            icon={status.businessType.formattingError ? "warning" : ""}
+            icon={
+              status.businessType.formattingError
+                ? "warning"
+                : status.businessType.submissionStatus
+            }
             iconId={status.businessType.properTitle}
             iconMessage={
               status.businessType.formattingError
                 ? status.businessType.formattingMessage
-                : ""
+                : status.businessType.submissionMessage
             }
             iconIsButton={false}
             onIconClick={() => {}}
@@ -532,12 +528,16 @@ export default function Profile() {
               status.addressLine1.formattingError ||
               status.addressLine1.submissionStatus === "error"
             }
-            icon={status.addressLine1.formattingError ? "warning" : ""}
+            icon={
+              status.addressLine1.formattingError
+                ? "warning"
+                : status.addressLine1.submissionStatus
+            }
             iconId={status.addressLine1.properTitle}
             iconMessage={
               status.addressLine1.formattingError
                 ? status.addressLine1.formattingMessage
-                : ""
+                : status.addressLine1.submissionMessage
             }
             iconIsButton={false}
             onIconClick={() => {}}
@@ -554,6 +554,10 @@ export default function Profile() {
             onBlur={() => {
               handleSubmit("addressLine2");
             }}
+            inputError={status.addressLine2.submissionStatus === "error"}
+            icon={status.addressLine2.submissionStatus}
+            iconId={status.addressLine2.properTitle}
+            iconMessage={status.addressLine2.submissionMessage}
             iconIsButton={false}
             onIconClick={() => {}}
           />
@@ -574,10 +578,16 @@ export default function Profile() {
               status.city.formattingError ||
               status.city.submissionStatus === "error"
             }
-            icon={status.city.formattingError ? "warning" : ""}
+            icon={
+              status.city.formattingError
+                ? "warning"
+                : status.city.submissionStatus
+            }
             iconId={status.city.properTitle}
             iconMessage={
-              status.city.formattingError ? status.city.formattingMessage : ""
+              status.city.formattingError
+                ? status.city.formattingMessage
+                : status.city.submissionMessage
             }
             iconIsButton={false}
             onIconClick={() => {}}
@@ -600,12 +610,16 @@ export default function Profile() {
               status.province.formattingError ||
               status.province.submissionStatus === "error"
             }
-            icon={status.province.formattingError ? "warning" : ""}
+            icon={
+              status.province.formattingError
+                ? "warning"
+                : status.province.submissionStatus
+            }
             iconId={status.province.properTitle}
             iconMessage={
               status.province.formattingError
                 ? status.province.formattingMessage
-                : ""
+                : status.province.submissionMessage
             }
             iconIsButton={false}
             onIconClick={() => {}}
@@ -629,12 +643,16 @@ export default function Profile() {
               status.postalCode.formattingError ||
               status.postalCode.submissionStatus === "error"
             }
-            icon={status.postalCode.formattingError ? "warning" : ""}
+            icon={
+              status.postalCode.formattingError
+                ? "warning"
+                : status.postalCode.submissionStatus
+            }
             iconId={status.postalCode.properTitle}
             iconMessage={
               status.postalCode.formattingError
                 ? status.postalCode.formattingMessage
-                : ""
+                : status.postalCode.submissionMessage
             }
             iconIsButton={false}
             onIconClick={() => {}}
@@ -658,12 +676,16 @@ export default function Profile() {
               status.phoneNumber.formattingError ||
               status.phoneNumber.submissionStatus === "error"
             }
-            icon={status.phoneNumber.formattingError ? "warning" : ""}
+            icon={
+              status.phoneNumber.formattingError
+                ? "warning"
+                : status.phoneNumber.submissionStatus
+            }
             iconId={status.phoneNumber.properTitle}
             iconMessage={
               status.phoneNumber.formattingError
                 ? status.phoneNumber.formattingMessage
-                : ""
+                : status.phoneNumber.submissionMessage
             }
             iconIsButton={false}
             onIconClick={() => {}}
@@ -686,12 +708,16 @@ export default function Profile() {
               status.preferredTime.formattingError ||
               status.preferredTime.submissionStatus === "error"
             }
-            icon={status.preferredTime.formattingError ? "warning" : ""}
+            icon={
+              status.preferredTime.formattingError
+                ? "warning"
+                : status.preferredTime.submissionStatus
+            }
             iconId={status.preferredTime.properTitle}
             iconMessage={
               status.preferredTime.formattingError
                 ? status.preferredTime.formattingMessage
-                : ""
+                : status.preferredTime.submissionMessage
             }
             iconIsButton={false}
             onIconClick={() => {}}
@@ -710,6 +736,10 @@ export default function Profile() {
             onBlur={() => {
               handleSubmit("submissionMessage");
             }}
+            inputError={status.submissionMessage.submissionStatus === "error"}
+            icon={status.submissionMessage.submissionStatus}
+            iconId={status.submissionMessage.properTitle}
+            iconMessage={status.submissionMessage.submissionMessage}
             iconIsButton={false}
             onIconClick={() => {}}
           />
