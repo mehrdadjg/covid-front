@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 
 import lottie from "lottie-web";
@@ -65,7 +65,7 @@ export default function Customize() {
   const sizes = ["Small", "Medium", "Large", "Extra Large"];
   const colors = ["Black", "Red", "Green", "Blue", "Yellow", "Orange"];
   const parCount = ["None", "One", "Two", "Three"];
-  const alignments = ["Left", "Right", "Center", "Justify"];
+  const alignments = ["Left", "Center", "Right", "Justify"];
 
   const [topLineProperties, setTopLineProperties] = useState({
     previousText: "",
@@ -124,6 +124,10 @@ export default function Customize() {
       spaceAfter: true,
     },
   ]);
+
+  useEffect(() => {
+    "/downloadpdf/settings";
+  }, []);
 
   const pdfPage = (
     <PDFPage
@@ -320,11 +324,9 @@ export default function Customize() {
           {paragraphCountProperties.count > 0 && (
             <Grid item xs={12}>
               <TextField
-                label="Paragraph 1 Text (Multiline)"
+                label="Paragraph 1 Text"
                 variant="outlined"
                 fullWidth
-                multiline
-                rows={3}
                 onFocus={() => {
                   setActiveComponent("par1");
                 }}
@@ -435,7 +437,7 @@ export default function Customize() {
             </Grid>
           )}
 
-          {paragraphCountProperties.count > 0 && (
+          {paragraphCountProperties.count > 1 && (
             <Grid item xs={12} md={6}>
               <FormControlLabel
                 control={
@@ -463,11 +465,9 @@ export default function Customize() {
           {paragraphCountProperties.count > 1 && (
             <Grid item xs={12}>
               <TextField
-                label="Paragraph 2 Text (Multiline)"
+                label="Paragraph 2 Text"
                 variant="outlined"
                 fullWidth
-                multiline
-                rows={3}
                 onFocus={() => {
                   setActiveComponent("par2");
                 }}
@@ -578,7 +578,7 @@ export default function Customize() {
             </Grid>
           )}
 
-          {paragraphCountProperties.count > 1 && (
+          {paragraphCountProperties.count > 2 && (
             <Grid item xs={12} md={6}>
               <FormControlLabel
                 control={
@@ -606,11 +606,9 @@ export default function Customize() {
           {paragraphCountProperties.count > 2 && (
             <Grid item xs={12}>
               <TextField
-                label="Paragraph 3 Text (Multiline)"
+                label="Paragraph 3 Text"
                 variant="outlined"
                 fullWidth
-                multiline
-                rows={3}
                 onFocus={() => {
                   setActiveComponent("par3");
                 }}
@@ -718,31 +716,6 @@ export default function Customize() {
                   </MenuItem>
                 ))}
               </TextField>
-            </Grid>
-          )}
-
-          {paragraphCountProperties.count > 2 && (
-            <Grid item xs={12} md={6}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    color="primary"
-                    checked={paragraphProperties[2].spaceAfter}
-                    onChange={(event) => {
-                      setParagraphProperties((old) => [
-                        old[0],
-                        old[1],
-                        { ...old[2], spaceAfter: event.target.checked },
-                      ]);
-                    }}
-                    onFocus={() => {
-                      setActiveComponent("par3");
-                    }}
-                    onBlur={resetActiveComponent}
-                  />
-                }
-                label="Space after paragraph"
-              />
             </Grid>
           )}
         </Grid>
