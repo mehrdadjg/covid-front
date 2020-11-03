@@ -236,6 +236,8 @@ export default function Customize() {
       }
 
       target.value = fromValue ? event.target.value : event.target.checked;
+      target.submissionStatus =
+        target.submissionStatus === "done" ? "" : target.submissionStatus;
 
       return newStatus;
     });
@@ -246,7 +248,78 @@ export default function Customize() {
    *
    * @param {Array} field This argument is an array of strings.
    */
-  const handleSumbit = (field) => {};
+  const handleSumbit = (field) => {
+    let property = status[field[0]];
+    for (let i = 1; i < field.length; i++) {
+      property = property[field[i]];
+    }
+
+    const fieldValue = property.value;
+    const oldFieldValue = property.lastSubmittedValue;
+
+    if (fieldValue === oldFieldValue) return;
+
+    const values = [{ field: field, value: fieldValue }];
+
+    fetch("/business/downloadpdf/settings", {
+      method: "POST",
+      cache: "no-cache",
+      headers: {
+        Authorization: `${auth.type} ${auth.value}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ values }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.code === 0) {
+          setStatus((old) => {
+            const newStatus = { ...old };
+
+            let target = newStatus[field[0]];
+            for (let i = 1; i < field.length; i++) {
+              target = target[field[i]];
+            }
+
+            target.submissionStatus = "done";
+            target.submissionMessage = "Stored successfully.";
+            target.lastSubmittedValue = fieldValue;
+
+            return newStatus;
+          });
+        } else {
+          setStatus((old) => {
+            const newStatus = { ...old };
+
+            let target = newStatus[field[0]];
+            for (let i = 1; i < field.length; i++) {
+              target = target[field[i]];
+            }
+
+            target.submissionStatus = "error";
+            target.submissionMessage = "Something went wrong. Try again later.";
+
+            return newStatus;
+          });
+        }
+      })
+      .catch((error) => {
+        setStatus((old) => {
+          const newStatus = { ...old };
+
+          let target = newStatus[field[0]];
+          for (let i = 1; i < field.length; i++) {
+            target = target[field[i]];
+          }
+
+          target.submissionStatus = "error";
+          target.submissionMessage =
+            "Something went wrong. Contact the administrator.";
+
+          return newStatus;
+        });
+      });
+  };
 
   /**
    * Loads the initial values of the status from the back-end.
