@@ -1,65 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useMediaQuery } from "react-responsive";
 import { useSelector } from "react-redux";
-
-import lottie from "lottie-web";
 
 import PDFPage from "./PDFPage";
 import IconedInputField from "./IconedInputField";
 
-import {
-  Checkbox,
-  FormControlLabel,
-  Grid,
-  MenuItem,
-  TextField,
-  Typography,
-} from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 export default function Customize() {
   const auth = useSelector((state) => state.auth);
 
   const [activeComponent, setActiveComponent] = useState("");
-  const iconContainer = useRef(null);
-
-  const doneAnimation = require("../animations/done.json");
-  const errorAnimation = require("../animations/error.json");
-  const [animationSetting, setAnimationSetting] = useState({
-    opacity: 1,
-  });
-
-  const playDone = () => {
-    setAnimationSetting((old) => ({ ...old, opacity: 1 }));
-
-    lottie
-      .loadAnimation({
-        container: iconContainer.current,
-        renderer: "svg",
-        loop: false,
-        autoplay: true,
-        animationData: doneAnimation,
-      })
-      .addEventListener("complete", () => {
-        setAnimationSetting((old) => ({ ...old, opacity: 0 }));
-        setTimeout(() => {
-          lottie.destroy();
-        }, 250);
-      });
-  };
-
-  const playError = () => {
-    setAnimationSetting((old) => ({ ...old, opacity: 1 }));
-
-    lottie.loadAnimation({
-      container: iconContainer.current,
-      renderer: "svg",
-      loop: false,
-      autoplay: true,
-      animationData: errorAnimation,
-    });
-  };
-
   const resetActiveComponent = () => {
     setActiveComponent(() => "");
   };
@@ -233,7 +185,7 @@ export default function Customize() {
         tag: "Paragraph 3 Text",
       },
       fontSize: {
-        value: 4,
+        value: 3,
         lastSubmittedValue: "",
         submissionStatus: "",
         submissionMessage: "",
@@ -296,64 +248,9 @@ export default function Customize() {
    */
   const handleSumbit = (field) => {};
 
-  const [topLineProperties, setTopLineProperties] = useState({
-    previousText: "",
-    text: "",
-    previousFontSize: 1,
-    fontSize: 1,
-    previousColor: 0,
-    color: 0,
-  });
-
-  const [qrCodeProperties, setQrCodeProperties] = useState({
-    previousSize: 1,
-    size: 1,
-  });
-
-  const [paragraphCountProperties, setParagraphCountProperties] = useState({
-    previousCount: 2,
-    count: 2,
-  });
-
-  const [paragraphProperties, setParagraphProperties] = useState([
-    {
-      previousText: "",
-      text: "",
-      previousFontSize: 1,
-      fontSize: 1,
-      previousAlignment: 0,
-      alignment: 0,
-      previousColor: 0,
-      color: 0,
-      previousSpaceAfter: true,
-      spaceAfter: true,
-    },
-    {
-      previousText: "",
-      text: "",
-      previousFontSize: 1,
-      fontSize: 1,
-      previousAlignment: 0,
-      alignment: 0,
-      previousColor: 0,
-      color: 0,
-      previousSpaceAfter: true,
-      spaceAfter: true,
-    },
-    {
-      previousText: "",
-      text: "",
-      previousFontSize: 1,
-      fontSize: 1,
-      previousAlignment: 0,
-      alignment: 0,
-      previousColor: 0,
-      color: 0,
-      previousSpaceAfter: true,
-      spaceAfter: true,
-    },
-  ]);
-
+  /**
+   * Loads the initial values of the status from the back-end.
+   */
   useEffect(() => {
     fetch("/business/downloadpdf/settings", {
       headers: {
@@ -799,261 +696,259 @@ export default function Customize() {
 
           {status.paragraphCount.value > 1 && (
             <Grid item xs={12}>
-              <TextField
+              <IconedInputField
+                type="text"
                 label="Paragraph 2 Text"
-                variant="outlined"
-                fullWidth
+                inputValue={status.paragraph2.text.value}
                 onFocus={() => {
                   setActiveComponent("par2");
                 }}
-                onBlur={resetActiveComponent}
+                onChange={(event) => {
+                  handleChange(event, ["paragraph2", "text"]);
+                }}
+                onBlur={() => {
+                  resetActiveComponent();
+                  handleSumbit(["paragraph2", "text"]);
+                }}
+                inputError={status.paragraph2.text.submissionStatus === "error"}
+                icon={status.paragraph2.text.submissionStatus}
+                iconId={status.paragraph2.text.tag}
+                iconMessage={status.paragraph2.text.submissionMessage}
+                iconIsButton={false}
+                onIconClick={() => {}}
               />
             </Grid>
           )}
 
           {status.paragraphCount.value > 1 && (
             <Grid item xs={6} sm={6}>
-              <TextField
+              <IconedInputField
+                type="select"
+                items={status.paragraph2.fontSize.allowedFrom}
                 label="Font Size"
-                variant="outlined"
-                select
-                SelectProps={{
-                  MenuProps: {
-                    disableScrollLock: true,
-                  },
-                }}
-                fullWidth
-                value={paragraphProperties[1].fontSize}
-                onChange={(event) => {
-                  setParagraphProperties((old) => [
-                    old[0],
-                    { ...old[1], fontSize: event.target.value },
-                    old[2],
-                  ]);
-                }}
+                inputValue={status.paragraph2.fontSize.value}
                 onFocus={() => {
                   setActiveComponent("par2");
                 }}
-                onBlur={resetActiveComponent}
-              >
-                {sizes.map((size, index) => (
-                  <MenuItem key={index} value={index}>
-                    {size}
-                  </MenuItem>
-                ))}
-              </TextField>
+                onChange={(event) => {
+                  handleChange(event, ["paragraph2", "fontSize"]);
+                }}
+                onBlur={() => {
+                  resetActiveComponent();
+                  handleSumbit(["paragraph2", "fontSize"]);
+                }}
+                inputError={
+                  status.paragraph2.fontSize.submissionStatus === "error"
+                }
+                icon={status.paragraph2.fontSize.submissionStatus}
+                iconId={status.paragraph2.fontSize.tag}
+                iconMessage={status.paragraph2.fontSize.submissionMessage}
+                iconIsButton={false}
+                onIconClick={() => {}}
+              />
             </Grid>
           )}
 
           {status.paragraphCount.value > 1 && (
             <Grid item xs={6} sm={6}>
-              <TextField
+              <IconedInputField
+                type="select"
+                items={status.paragraph2.alignment.allowedFrom}
                 label="Alignment"
-                variant="outlined"
-                select
-                SelectProps={{
-                  MenuProps: {
-                    disableScrollLock: true,
-                  },
-                }}
-                fullWidth
-                value={paragraphProperties[1].alignment}
-                onChange={(event) => {
-                  setParagraphProperties((old) => [
-                    old[0],
-                    { ...old[1], alignment: event.target.value },
-                    old[2],
-                  ]);
-                }}
+                inputValue={status.paragraph2.alignment.value}
                 onFocus={() => {
                   setActiveComponent("par2");
                 }}
-                onBlur={resetActiveComponent}
-              >
-                {alignments.map((align, index) => (
-                  <MenuItem key={index} value={index}>
-                    {align}
-                  </MenuItem>
-                ))}
-              </TextField>
+                onChange={(event) => {
+                  handleChange(event, ["paragraph2", "alignment"]);
+                }}
+                onBlur={() => {
+                  resetActiveComponent();
+                  handleSumbit(["paragraph2", "alignment"]);
+                }}
+                inputError={
+                  status.paragraph2.alignment.submissionStatus === "error"
+                }
+                icon={status.paragraph2.alignment.submissionStatus}
+                iconId={status.paragraph2.alignment.tag}
+                iconMessage={status.paragraph2.alignment.submissionMessage}
+                iconIsButton={false}
+                onIconClick={() => {}}
+              />
             </Grid>
           )}
 
           {status.paragraphCount.value > 1 && (
             <Grid item xs={12} md={6}>
-              <TextField
-                label="Color"
-                variant="outlined"
-                select
-                SelectProps={{
-                  MenuProps: {
-                    disableScrollLock: true,
-                  },
-                }}
-                fullWidth
-                value={paragraphProperties[1].color}
-                onChange={(event) => {
-                  setParagraphProperties((old) => [
-                    old[0],
-                    { ...old[1], color: event.target.value },
-                    old[2],
-                  ]);
-                }}
+              <IconedInputField
+                type="select"
+                items={status.paragraph2.fontColor.allowedFrom}
+                label="Font Color"
+                inputValue={status.paragraph2.fontColor.value}
                 onFocus={() => {
                   setActiveComponent("par2");
                 }}
-                onBlur={resetActiveComponent}
-              >
-                {colors.map((color, index) => (
-                  <MenuItem key={index} value={index}>
-                    {color}
-                  </MenuItem>
-                ))}
-              </TextField>
+                onChange={(event) => {
+                  handleChange(event, ["paragraph2", "fontColor"]);
+                }}
+                onBlur={() => {
+                  resetActiveComponent();
+                  handleSumbit(["paragraph2", "fontColor"]);
+                }}
+                inputError={
+                  status.paragraph2.fontColor.submissionStatus === "error"
+                }
+                icon={status.paragraph2.fontColor.submissionStatus}
+                iconId={status.paragraph2.fontColor.tag}
+                iconMessage={status.paragraph2.fontColor.submissionMessage}
+                iconIsButton={false}
+                onIconClick={() => {}}
+              />
             </Grid>
           )}
 
           {status.paragraphCount.value > 2 && (
             <Grid item xs={12} md={6}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    color="primary"
-                    checked={paragraphProperties[1].spaceAfter}
-                    onChange={(event) => {
-                      setParagraphProperties((old) => [
-                        old[0],
-                        { ...old[1], spaceAfter: event.target.checked },
-                        old[2],
-                      ]);
-                    }}
-                    onFocus={() => {
-                      setActiveComponent("par2");
-                    }}
-                    onBlur={resetActiveComponent}
-                  />
-                }
+              <IconedInputField
+                type="checkbox"
                 label="Space after paragraph"
+                inputValue={status.paragraph2.spaceAfter.value}
+                onFocus={() => {
+                  setActiveComponent("par2");
+                }}
+                onChange={(event) => {
+                  handleChange(event, ["paragraph2", "spaceAfter"], false);
+                }}
+                onBlur={() => {
+                  resetActiveComponent();
+                  handleSumbit(["paragraph2", "spaceAfter"]);
+                }}
+                inputError={
+                  status.paragraph2.spaceAfter.submissionStatus === "error"
+                }
+                icon={status.paragraph2.spaceAfter.submissionStatus}
+                iconId={status.paragraph2.spaceAfter.tag}
+                iconMessage={status.paragraph2.spaceAfter.submissionMessage}
+                iconIsButton={false}
+                onIconClick={() => {}}
               />
             </Grid>
           )}
 
           {status.paragraphCount.value > 2 && (
             <Grid item xs={12}>
-              <TextField
+              <IconedInputField
+                type="text"
                 label="Paragraph 3 Text"
-                variant="outlined"
-                fullWidth
+                inputValue={status.paragraph3.text.value}
                 onFocus={() => {
                   setActiveComponent("par3");
                 }}
-                onBlur={resetActiveComponent}
+                onChange={(event) => {
+                  handleChange(event, ["paragraph3", "text"]);
+                }}
+                onBlur={() => {
+                  resetActiveComponent();
+                  handleSumbit(["paragraph3", "text"]);
+                }}
+                inputError={status.paragraph3.text.submissionStatus === "error"}
+                icon={status.paragraph3.text.submissionStatus}
+                iconId={status.paragraph3.text.tag}
+                iconMessage={status.paragraph3.text.submissionMessage}
+                iconIsButton={false}
+                onIconClick={() => {}}
               />
             </Grid>
           )}
 
           {status.paragraphCount.value > 2 && (
             <Grid item xs={6} sm={6}>
-              <TextField
+              <IconedInputField
+                type="select"
+                items={status.paragraph3.fontSize.allowedFrom}
                 label="Font Size"
-                variant="outlined"
-                select
-                SelectProps={{
-                  MenuProps: {
-                    disableScrollLock: true,
-                  },
-                }}
-                fullWidth
-                value={paragraphProperties[2].fontSize}
-                onChange={(event) => {
-                  setParagraphProperties((old) => [
-                    old[0],
-                    old[1],
-                    { ...old[2], fontSize: event.target.value },
-                  ]);
-                }}
+                inputValue={status.paragraph3.fontSize.value}
                 onFocus={() => {
                   setActiveComponent("par3");
                 }}
-                onBlur={resetActiveComponent}
-              >
-                {sizes.map((size, index) => (
-                  <MenuItem key={index} value={index}>
-                    {size}
-                  </MenuItem>
-                ))}
-              </TextField>
+                onChange={(event) => {
+                  handleChange(event, ["paragraph3", "fontSize"]);
+                }}
+                onBlur={() => {
+                  resetActiveComponent();
+                  handleSumbit(["paragraph3", "fontSize"]);
+                }}
+                inputError={
+                  status.paragraph3.fontSize.submissionStatus === "error"
+                }
+                icon={status.paragraph3.fontSize.submissionStatus}
+                iconId={status.paragraph3.fontSize.tag}
+                iconMessage={status.paragraph3.fontSize.submissionMessage}
+                iconIsButton={false}
+                onIconClick={() => {}}
+              />
             </Grid>
           )}
 
           {status.paragraphCount.value > 2 && (
             <Grid item xs={6} sm={6}>
-              <TextField
+              <IconedInputField
+                type="select"
+                items={status.paragraph3.alignment.allowedFrom}
                 label="Alignment"
-                variant="outlined"
-                select
-                SelectProps={{
-                  MenuProps: {
-                    disableScrollLock: true,
-                  },
-                }}
-                fullWidth
-                value={paragraphProperties[2].alignment}
-                onChange={(event) => {
-                  setParagraphProperties((old) => [
-                    old[0],
-                    old[1],
-                    { ...old[2], alignment: event.target.value },
-                  ]);
-                }}
+                inputValue={status.paragraph3.alignment.value}
                 onFocus={() => {
                   setActiveComponent("par3");
                 }}
-                onBlur={resetActiveComponent}
-              >
-                {alignments.map((align, index) => (
-                  <MenuItem key={index} value={index}>
-                    {align}
-                  </MenuItem>
-                ))}
-              </TextField>
+                onChange={(event) => {
+                  handleChange(event, ["paragraph3", "alignment"]);
+                }}
+                onBlur={() => {
+                  resetActiveComponent();
+                  handleSumbit(["paragraph3", "alignment"]);
+                }}
+                inputError={
+                  status.paragraph3.alignment.submissionStatus === "error"
+                }
+                icon={status.paragraph3.alignment.submissionStatus}
+                iconId={status.paragraph3.alignment.tag}
+                iconMessage={status.paragraph3.alignment.submissionMessage}
+                iconIsButton={false}
+                onIconClick={() => {}}
+              />
             </Grid>
           )}
 
           {status.paragraphCount.value > 2 && (
             <Grid item xs={12} md={6}>
-              <TextField
-                label="Color"
-                variant="outlined"
-                select
-                SelectProps={{
-                  MenuProps: {
-                    disableScrollLock: true,
-                  },
-                }}
-                fullWidth
-                value={paragraphProperties[2].color}
-                onChange={(event) => {
-                  setParagraphProperties((old) => [
-                    old[0],
-                    old[1],
-                    { ...old[2], color: event.target.value },
-                  ]);
-                }}
+              <IconedInputField
+                type="select"
+                items={status.paragraph3.fontColor.allowedFrom}
+                label="Font Color"
+                inputValue={status.paragraph3.fontColor.value}
                 onFocus={() => {
                   setActiveComponent("par3");
                 }}
-                onBlur={resetActiveComponent}
-              >
-                {colors.map((color, index) => (
-                  <MenuItem key={index} value={index}>
-                    {color}
-                  </MenuItem>
-                ))}
-              </TextField>
+                onChange={(event) => {
+                  handleChange(event, ["paragraph3", "fontColor"]);
+                }}
+                onBlur={() => {
+                  resetActiveComponent();
+                  handleSumbit(["paragraph3", "fontColor"]);
+                }}
+                inputError={
+                  status.paragraph3.fontColor.submissionStatus === "error"
+                }
+                icon={status.paragraph3.fontColor.submissionStatus}
+                iconId={status.paragraph3.fontColor.tag}
+                iconMessage={status.paragraph3.fontColor.submissionMessage}
+                iconIsButton={false}
+                onIconClick={() => {}}
+              />
             </Grid>
           )}
         </Grid>
+
         {isSmallScreen && (
           <div>
             <div
@@ -1062,32 +957,16 @@ export default function Customize() {
             >
               {pdfPage}
             </div>
-            <div
-              className={[
-                classes.animationContainer,
-                classes.hoverAnimationContainer,
-              ].join(" ")}
-              style={{
-                opacity: animationSetting.opacity,
-              }}
-              ref={iconContainer}
-            />
           </div>
         )}
       </div>
+
       {!isSmallScreen && (
         <div
           className={classes.pdfContainer}
           style={{ position: "fixed", right: 0, top: "10vh" }}
         >
           {pdfPage}
-          <div
-            className={classes.animationContainer}
-            style={{
-              opacity: animationSetting.opacity,
-            }}
-            ref={iconContainer}
-          />
         </div>
       )}
     </div>
@@ -1112,16 +991,5 @@ const useClasses = makeStyles((theme) => ({
   },
   formContainer: {
     marginTop: theme.spacing(2),
-  },
-  animationContainer: {
-    transition: "all 0.25s ease-out",
-    overflow: "hidden",
-    width: 50,
-    height: 50,
-  },
-  hoverAnimationContainer: {
-    position: "fixed",
-    bottom: 16,
-    right: 16,
   },
 }));
