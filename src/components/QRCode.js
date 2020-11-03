@@ -51,7 +51,6 @@ export default function QRCode() {
     })
       .then((response) => response.blob())
       .then((data) => {
-        console.log(data);
         const url = window.URL.createObjectURL(new Blob([data]));
         const link = document.createElement("a");
         link.href = url;
@@ -80,7 +79,6 @@ export default function QRCode() {
     })
       .then((response) => response.blob())
       .then((data) => {
-        console.log(data);
         const url = window.URL.createObjectURL(new Blob([data]));
         const link = document.createElement("a");
         link.href = url;
