@@ -211,11 +211,12 @@ export default function EmailVerifier() {
 
 const useClasses = makeStyles((theme) => ({
   root: {
-    position: "absolute",
+    position: "sticky",
     margin: theme.spacing(2),
     width: "30vw",
-    minWidth: 350,
-    right: 0,
+    height: "100%",
+    maxWidth: 400,
+    top: "calc(10vh + 16px)",
     borderRadius: 15,
   },
   progressContainer: {

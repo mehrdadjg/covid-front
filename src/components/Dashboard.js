@@ -102,7 +102,6 @@ function TabPanel(props) {
       role="tabpanel"
       className={classes.panel}
       hidden={currentTab !== index}
-      style={isSmallScreen ? {} : { marginLeft: "20vw" }}
       {...other}
     >
       {persist ? children : currentTab === index && children}
@@ -118,10 +117,9 @@ const useStyles = makeStyles((theme) => ({
   },
   tabs: {
     height: "90vh",
-    minWidth: "20vw",
+    minWidth: "200px",
     borderRight: `1px solid ${theme.palette.divider}`,
-    position: "fixed",
-    left: 0,
+    position: "sticky",
     top: "10vh",
   },
   formControl: {
@@ -132,6 +130,7 @@ const useStyles = makeStyles((theme) => ({
   },
   panel: {
     position: "relative",
+    maxWidth: "1300px",
     width: "100%",
   },
 }));

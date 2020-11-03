@@ -13,7 +13,7 @@ export default function BusinessOverview() {
   const classes = useStyles();
   return (
     <div className={classes.root}>
-      <div>
+      <div style={{ flexGrow: 1 }}>
         <QRCode />
       </div>
       {!emailIsVerified && <EmailVerifier />}

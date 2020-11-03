@@ -475,29 +475,13 @@ export default function Customize() {
   return (
     <div className={classes.root}>
       <div className={classes.controlContainer}>
-        <Typography
-          variant="body1"
-          style={
-            isSmallScreen
-              ? { width: "auto" }
-              : {
-                  width: "calc(100% - 318.75px)",
-                }
-          }
-        >
+        <Typography variant="body1">
           You can change the following setting. We will store them as you are
           editing.
         </Typography>
         <Grid
           container
           className={classes.formContainer}
-          style={
-            isSmallScreen
-              ? { width: "auto" }
-              : {
-                  width: "calc(100% - 318.75px)",
-                }
-          }
           direction="row"
           spacing={2}
           alignItems="center"
@@ -1037,7 +1021,7 @@ export default function Customize() {
       {!isSmallScreen && (
         <div
           className={classes.pdfContainer}
-          style={{ position: "fixed", right: 0, top: "10vh" }}
+          style={{ position: "sticky", top: "10vh" }}
         >
           {pdfPage}
         </div>

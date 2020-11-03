@@ -18,6 +18,9 @@ const theme = createMuiTheme({
     primary: {
       main: purple[500],
     },
+    primaryBackdrop: {
+      main: purple[100],
+    },
     secondary: {
       main: red[900],
     },

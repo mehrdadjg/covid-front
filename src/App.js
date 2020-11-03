@@ -54,10 +54,16 @@ export default function App() {
 
 const useStyles = makeStyles((theme) => ({
   root: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
     flexGrow: 1,
     width: "100%",
+    background: theme.palette.primaryBackdrop.main,
+    minHeight: "100vh",
   },
   contents: {
     width: "100%",
+    maxWidth: "1500px",
   },
 }));

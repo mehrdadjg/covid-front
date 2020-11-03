@@ -37,12 +37,14 @@ export default function Customize(props) {
       (event.clientX -
         event.currentTarget.offsetLeft -
         event.currentTarget.offsetParent.offsetLeft -
+        event.currentTarget.offsetParent.offsetParent.offsetLeft -
         width / 2) /
       offset;
     const y =
       (event.clientY -
         event.currentTarget.offsetTop -
         event.currentTarget.offsetParent.offsetTop -
+        event.currentTarget.offsetParent.offsetParent.offsetTop -
         height / 2) /
       offset;
 
