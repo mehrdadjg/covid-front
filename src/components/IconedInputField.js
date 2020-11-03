@@ -2,7 +2,15 @@ import React, { useState, useEffect, useRef } from "react";
 
 import Lottie from "lottie-web";
 
-import { IconButton, MenuItem, TextField, Tooltip } from "@material-ui/core";
+import {
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  IconButton,
+  MenuItem,
+  TextField,
+  Tooltip,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 export default function IconedInputField(props) {
@@ -65,6 +73,15 @@ export default function IconedInputField(props) {
           </MenuItem>
         ))}
       </TextField>
+    );
+  } else if (type === "checkbox") {
+    input = (
+      <FormControl fullWidth>
+        <FormControlLabel
+          control={<Checkbox color="primary" checked={inputValue} {...other} />}
+          label={label}
+        />
+      </FormControl>
     );
   }
 
