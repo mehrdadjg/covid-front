@@ -159,7 +159,6 @@ export default function Customize(props) {
                   props.activeComponent === "par3"
                     ? "rgba(255,0,0,0.25)"
                     : "rgba(0,0,0,0)",
-                marginBlockEnd: props.par3SpaceAfter ? "1em" : "0",
                 textAlign: props.par3Algin,
                 color: props.par3Color,
               }}
