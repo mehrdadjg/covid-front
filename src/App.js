@@ -37,7 +37,7 @@ export default function App() {
       <Header />
       <div className={styles.contents}>
         <Switch>
-          <Route exact path="/checkin/:businessID">
+          <Route exact path="/checkin/:businessLink">
             <CheckIn />
           </Route>
           <Route exact path="/business">
