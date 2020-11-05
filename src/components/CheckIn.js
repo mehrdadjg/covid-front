@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useParams } from "react-router";
+
+import Lottie from "lottie-web";
 
 import { Button, Grid, TextField, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 export default function CheckIn() {
-  let { businessID } = useParams();
+  const { businessLink } = useParams();
 
   const [status, setStatus] = useState({
     email: "",
@@ -14,7 +16,13 @@ export default function CheckIn() {
     birthday: null,
 
     errorMessage: "",
+
+    waiting: false,
+    successful: false,
+    submissionMessage: "",
   });
+
+  const successfulContainer = useRef(null);
 
   const isValidEmail = (email) => {
     if (email === "") {
@@ -35,7 +43,9 @@ export default function CheckIn() {
     event.persist();
     if (field === "birthday") {
       const [year, month, day] = event.target.value.split("-");
-      const birthday = new Date(year, month, day);
+
+      // Date constructor expects month to be 0-indexed
+      const birthday = new Date(year, month - 1, day);
 
       setStatus((old) => ({
         ...old,
@@ -64,15 +74,88 @@ export default function CheckIn() {
 
       return;
     }
+
+    setStatus((old) => ({
+      ...old,
+      waiting: true,
+    }));
+
+    const newVisitor = { email: status.email, link: businessLink };
+    status.fname && (newVisitor.fname = status.fname);
+    status.lname && (newVisitor.lname = status.lname);
+    status.birthday && (newVisitor.birthday = status.birthday);
+
+    console.log(newVisitor);
+
+    fetch("/business/visits/add", {
+      method: "POST",
+      cache: "no-cache",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newVisitor),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.code === 0) {
+          setStatus((old) => ({
+            ...old,
+            successful: true,
+            submissionMessage: data.submissionMessage
+              ? data.submissionMessage
+              : "Your visit was recorded successfully.",
+            errorMessage: "",
+          }));
+
+          const success = require("../animations/successful.json");
+          Lottie.loadAnimation({
+            container: successfulContainer.current,
+            renderer: "svg",
+            loop: false,
+            autoplay: true,
+            animationData: success,
+          });
+        } else {
+          if (data.error.id === 100032) {
+            setStatus((old) => ({
+              ...old,
+              errorMessage: data.error.message,
+            }));
+          } else {
+            setStatus((old) => ({
+              ...old,
+              errorMessage: "Something went wrong. Try again shortly.",
+            }));
+          }
+        }
+      })
+      .catch(() => {
+        setStatus((old) => ({
+          ...old,
+          errorMessage: "Something went wrong. Contact the administrator.",
+        }));
+      })
+      .finally(() => {
+        setStatus((old) => ({
+          ...old,
+          waiting: false,
+        }));
+      });
   };
 
   const classes = useClasses();
   return (
     <div className={classes.root}>
       <div className={classes.container}>
-        <Grid container direction="row" spacing={2} justify="center">
-          <Grid item>
-            <Typography variant="body2" xs={12}>
+        <Grid
+          container
+          direction="row"
+          spacing={2}
+          justify="center"
+          style={{ visibility: status.successful ? "hidden" : "visible" }}
+        >
+          <Grid item xs={12}>
+            <Typography variant="body2">
               Please fill in the form below and click on submit.
             </Typography>
           </Grid>
@@ -91,6 +174,7 @@ export default function CheckIn() {
                 handleChange(event, "email");
               }}
               error={status.errorMessage.toLowerCase().includes("email")}
+              disabled={status.waiting}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -101,6 +185,7 @@ export default function CheckIn() {
               onChange={(event) => {
                 handleChange(event, "fname");
               }}
+              disabled={status.waiting}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -111,6 +196,7 @@ export default function CheckIn() {
               onChange={(event) => {
                 handleChange(event, "lname");
               }}
+              disabled={status.waiting}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -125,6 +211,7 @@ export default function CheckIn() {
               onChange={(event) => {
                 handleChange(event, "birthday");
               }}
+              disabled={status.waiting}
             />
           </Grid>
           <Grid item xs={12}>
@@ -133,6 +220,7 @@ export default function CheckIn() {
                 variant="contained"
                 color="primary"
                 onClick={handleSubmit}
+                disabled={status.waiting}
               >
                 Submit
               </Button>
@@ -145,6 +233,33 @@ export default function CheckIn() {
               </Typography>
             </Grid>
           )}
+        </Grid>
+        <Grid
+          container
+          direction="row"
+          justify="center"
+          alignItems="center"
+          style={{
+            position: "absolute",
+            top: 0,
+            height: "100%",
+            width: "calc(100% - 16px)",
+            visibility: status.successful ? "visible" : "collapse",
+          }}
+        >
+          <Grid item xs={12}>
+            <div
+              style={{
+                width: "100%",
+                height: 200,
+                overflow: "hidden",
+              }}
+              ref={successfulContainer}
+            ></div>
+          </Grid>
+          <Grid item>
+            <Typography variant="body2">{status.submissionMessage}</Typography>
+          </Grid>
         </Grid>
       </div>
     </div>
@@ -159,6 +274,7 @@ const useClasses = makeStyles((theme) => ({
     alignItems: "center",
   },
   container: {
+    position: "relative",
     maxWidth: 450,
     margin: theme.spacing(2),
     padding: theme.spacing(1),
@@ -166,6 +282,7 @@ const useClasses = makeStyles((theme) => ({
     borderRadius: 15,
     border: "1px solid black",
     boxShadow: "5px 20px 20px rgba(0,0,0,0.2), 0px 0px 20px rgba(0,0,0,0.5)",
+    transition: "all 1s ease",
   },
   buttonContainer: {
     width: "100%",
