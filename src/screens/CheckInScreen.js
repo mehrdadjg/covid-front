@@ -1,12 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router";
 import { useSelector } from "react-redux";
+import PropTypes from "prop-types";
 
 import Lottie from "lottie-web";
 
 import { Button, Grid, TextField, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
+/**
+ * A component used for adding new visits to a business.
+ *
+ * @component
+ */
 export default function CheckIn(props) {
   const auth = useSelector((state) => state.auth);
 
@@ -29,6 +35,12 @@ export default function CheckIn(props) {
 
   const successfulContainer = useRef(null);
 
+  /**
+   * Given a string, determines whether it's a valid email address or not.
+   *
+   * @param   {String} email
+   * @returns {Boolean}
+   */
   const isValidEmail = (email) => {
     if (email === "") {
       return { isValid: false, message: "Email address cannot be empty." };
@@ -72,6 +84,12 @@ export default function CheckIn(props) {
     }
   }, [auth.type, auth.value]);
 
+  /**
+   * Handles changing the status.
+   *
+   * @param {Object} event The event that fired this method.
+   * @param {String} field The field to be changed.
+   */
   const handleChange = (event, field) => {
     event.persist();
     if (field === "birthday") {
@@ -96,6 +114,9 @@ export default function CheckIn(props) {
     }
   };
 
+  /**
+   * Handles submitting a new visit.
+   */
   const handleSubmit = () => {
     const { isValid, message } = isValidEmail(status.email);
 
@@ -300,6 +321,9 @@ export default function CheckIn(props) {
     </div>
   );
 }
+
+CheckIn.propTypes = { dummy: PropTypes.bool };
+CheckIn.defaultProps = { dummy: false };
 
 const useClasses = makeStyles((theme) => ({
   root: {
