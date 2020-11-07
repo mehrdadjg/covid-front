@@ -1,12 +1,17 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router";
+import { useSelector } from "react-redux";
 
 import Lottie from "lottie-web";
 
 import { Button, Grid, TextField, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
-export default function CheckIn() {
+export default function CheckIn(props) {
+  const auth = useSelector((state) => state.auth);
+
+  const { dummy } = props;
+
   const { businessLink } = useParams();
 
   const [status, setStatus] = useState({
@@ -38,6 +43,34 @@ export default function CheckIn() {
 
     return { isValid: true, message: null };
   };
+
+  useEffect(() => {
+    if (auth.type) {
+      fetch("/business/visits/getcount", {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+          Authorization: `${auth.type} ${auth.value}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: new Date("2020-11-07T04:24:07.901+00:00"),
+          to: new Date(),
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.code === 0) {
+            console.log(data.count);
+          } else {
+            console.log({ data });
+          }
+        })
+        .catch((error) => {
+          console.log({ error });
+        });
+    }
+  }, [auth.type, auth.value]);
 
   const handleChange = (event, field) => {
     event.persist();
@@ -80,12 +113,14 @@ export default function CheckIn() {
       waiting: true,
     }));
 
-    const newVisitor = { email: status.email, link: businessLink };
+    const newVisitor = {
+      email: status.email,
+      link: businessLink,
+      dummy: dummy,
+    };
     status.fname && (newVisitor.fname = status.fname);
     status.lname && (newVisitor.lname = status.lname);
     status.birthday && (newVisitor.birthday = status.birthday);
-
-    console.log(newVisitor);
 
     fetch("/business/visits/add", {
       method: "POST",
@@ -257,7 +292,7 @@ export default function CheckIn() {
               ref={successfulContainer}
             ></div>
           </Grid>
-          <Grid item>
+          <Grid item style={{ textAlign: "center" }}>
             <Typography variant="body2">{status.submissionMessage}</Typography>
           </Grid>
         </Grid>
