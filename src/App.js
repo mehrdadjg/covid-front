@@ -7,10 +7,10 @@ import { signIn } from "./actions/signedIn";
 import { setBusiness } from "./actions/business";
 import { setAuthentication } from "./actions/authentication";
 
-import CheckIn from "./components/CheckIn";
 import Header from "./components/Header";
 import WelcomeScreen from "./screens/WelcomeScreen";
 import BusinessScreen from "./screens/BusinessScreen";
+import CheckInScreen from "./screens/CheckInScreen";
 
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -38,7 +38,7 @@ export default function App() {
       <div className={styles.contents}>
         <Switch>
           <Route exact path="/checkin/:businessLink">
-            <CheckIn />
+            <CheckInScreen />
           </Route>
           <Route exact path="/business">
             <BusinessScreen />
