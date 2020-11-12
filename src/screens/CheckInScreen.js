@@ -5,6 +5,8 @@ import PropTypes from "prop-types";
 
 import Lottie from "lottie-web";
 
+import { AddVisitRequest } from "../api/Request";
+
 import { Button, Grid, TextField, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -142,6 +144,16 @@ export default function CheckIn(props) {
     status.fname && (newVisitor.fname = status.fname);
     status.lname && (newVisitor.lname = status.lname);
     status.birthday && (newVisitor.birthday = status.birthday);
+
+    const request = new AddVisitRequest()
+      .setParam("email", status.email)
+      .setParam("link", businessLink)
+      .setParam("dummy", dummy)
+      .setParamConditional("fname", status.fname)
+      .setParamConditional("lname", status.lname)
+      .setParamConditional("birthday", status.birthday);
+
+    console.log(request);
 
     fetch("/business/visits/add", {
       method: "POST",
