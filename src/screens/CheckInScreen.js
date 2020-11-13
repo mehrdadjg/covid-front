@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 
 import Lottie from "lottie-web";
 
+import APIRequestManager from "../api/APIRequestManager";
 import { AddVisitRequest } from "../api/Request";
 
 import { Button, Grid, TextField, Typography } from "@material-ui/core";
@@ -136,6 +137,7 @@ export default function CheckIn(props) {
       waiting: true,
     }));
 
+    /*
     const newVisitor = {
       email: status.email,
       link: businessLink,
@@ -144,6 +146,7 @@ export default function CheckIn(props) {
     status.fname && (newVisitor.fname = status.fname);
     status.lname && (newVisitor.lname = status.lname);
     status.birthday && (newVisitor.birthday = status.birthday);
+    */
 
     const request = new AddVisitRequest()
       .setParam("email", status.email)
@@ -153,8 +156,54 @@ export default function CheckIn(props) {
       .setParamConditional("lname", status.lname)
       .setParamConditional("birthday", status.birthday);
 
-    console.log(request);
+    APIRequestManager.submit(request)
+      .then((data) => {
+        if (data.code === 0) {
+          setStatus((old) => ({
+            ...old,
+            successful: true,
+            submissionMessage: data.submissionMessage
+              ? data.submissionMessage
+              : "Your visit was recorded successfully.",
+            errorMessage: "",
+          }));
 
+          const success = require("../animations/successful.json");
+          Lottie.loadAnimation({
+            container: successfulContainer.current,
+            renderer: "svg",
+            loop: false,
+            autoplay: true,
+            animationData: success,
+          });
+        } else {
+          if (data.error.id === 100032) {
+            setStatus((old) => ({
+              ...old,
+              errorMessage: data.error.message,
+            }));
+          } else {
+            setStatus((old) => ({
+              ...old,
+              errorMessage: "Something went wrong. Try again shortly.",
+            }));
+          }
+        }
+      })
+      .catch(() => {
+        setStatus((old) => ({
+          ...old,
+          errorMessage: "Something went wrong. Contact the administrator.",
+        }));
+      })
+      .finally(() => {
+        setStatus((old) => ({
+          ...old,
+          waiting: false,
+        }));
+      });
+
+    /*
     fetch("/business/visits/add", {
       method: "POST",
       cache: "no-cache",
@@ -209,6 +258,7 @@ export default function CheckIn(props) {
           waiting: false,
         }));
       });
+    */
   };
 
   const classes = useClasses();
