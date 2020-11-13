@@ -12,7 +12,7 @@ import { createStore } from "redux";
 import reducers from "./reducers";
 
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles";
-import { purple, red } from "@material-ui/core/colors";
+import { purple, red, deepOrange } from "@material-ui/core/colors";
 const theme = createMuiTheme({
   palette: {
     primary: {
@@ -23,6 +23,9 @@ const theme = createMuiTheme({
     },
     secondary: {
       main: red[900],
+    },
+    error: {
+      main: deepOrange[900],
     },
   },
 });
