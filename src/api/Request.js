@@ -1,5 +1,3 @@
-import { TransferWithinAStationOutlined } from "@material-ui/icons";
-
 /**
  * A container for requests.
  */
