@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { useParams } from "react-router";
-import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 
 import Lottie from "lottie-web";
@@ -17,8 +16,6 @@ import { makeStyles } from "@material-ui/core/styles";
  * @component
  */
 export default function CheckIn(props) {
-  const auth = useSelector((state) => state.auth);
-
   const { dummy } = props;
 
   const { businessLink } = useParams();
@@ -58,34 +55,6 @@ export default function CheckIn(props) {
 
     return { isValid: true, message: null };
   };
-
-  useEffect(() => {
-    if (auth.type) {
-      fetch("/business/visits/getcount", {
-        method: "POST",
-        cache: "no-cache",
-        headers: {
-          Authorization: `${auth.type} ${auth.value}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: new Date("2020-11-07T04:24:07.901+00:00"),
-          to: new Date(),
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.code === 0) {
-            console.log(data.count);
-          } else {
-            console.log({ data });
-          }
-        })
-        .catch((error) => {
-          console.log({ error });
-        });
-    }
-  }, [auth.type, auth.value]);
 
   /**
    * Handles changing the status.
